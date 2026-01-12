@@ -42,7 +42,7 @@ impl TrCurve for Curve25519 {
             LazyLock::new(|| Integer::from_digits(Curve25519::curve_order_bytes(), Order::Msf));
         return &N;
     }
-    
+
     fn field_order() -> &'static Integer {
         static P: LazyLock<Integer> =
             LazyLock::new(|| Integer::from_digits(Curve25519::field_order_bytes(), Order::Msf));
