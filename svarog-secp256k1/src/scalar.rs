@@ -1,5 +1,8 @@
+use std::sync::LazyLock;
+
 use curve_abstract::{self as abs, TrCurve};
 use rand::RngCore;
+use rug::{Integer, integer::Order};
 use secp256k1_sys::{self as ffi, CPtr};
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +48,7 @@ impl abs::TrScalar<Secp256k1> for Scalar {
         if buf.len() > 0 {
             num[dst..].copy_from_slice(&buf[src..]);
         }
-        if num.as_ref() > Secp256k1::curve_order() {
+        if num.as_ref() > Secp256k1::curve_order_bytes() {
             // ... then we have `num % CURVE_ORDER == num - CURVE_ORDER`.
             let x2 = u64::from_be_bytes(num[16..24].try_into().unwrap());
             let x1 = u64::from_be_bytes(num[24..32].try_into().unwrap());
@@ -70,6 +73,23 @@ impl abs::TrScalar<Secp256k1> for Scalar {
 
     fn to_bytes(&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+
+    #[inline]
+    fn new_from_int(x: impl Into<rug::Integer>) -> Self {
+        static N: LazyLock<Integer> =
+            LazyLock::new(|| Integer::from_digits(&Secp256k1::curve_order_bytes(), Order::Msf));
+        let x: Integer = x.into();
+        let x = x.modulo(&N);
+        let buf = x.to_digits::<u8>(rug::integer::Order::Msf);
+        return Self::new_from_bytes(&buf);
+    }
+
+    #[inline]
+    fn to_int(&self) -> rug::Integer {
+        let buf = self.to_bytes();
+        let x = rug::Integer::from_digits(&buf, rug::integer::Order::Msf);
+        return x;
     }
 
     #[inline]
@@ -187,7 +207,7 @@ impl<'de> Deserialize<'de> for Scalar {
         D: serde::Deserializer<'de>,
     {
         let inner: [u8; 32] = <[u8; 32]>::deserialize(deserializer)?;
-        if inner.as_ref() >= Secp256k1::curve_order() {
+        if inner.as_ref() >= Secp256k1::curve_order_bytes() {
             Err(serde::de::Error::custom("buf >= curve_order"))
         } else {
             Ok(Scalar(inner))

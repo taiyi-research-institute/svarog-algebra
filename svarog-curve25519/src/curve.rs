@@ -3,6 +3,7 @@ use std::sync::LazyLock;
 use curve_abstract::TrCurve;
 use curve25519_dalek::{Scalar as EdwardsScalar, edwards::SubgroupPoint};
 use group::Group;
+use rug::{Integer, integer::Order};
 use serde::{Deserialize, Serialize};
 
 use crate::{Point, Scalar};
@@ -14,7 +15,7 @@ impl TrCurve for Curve25519 {
     type PointT = Point;
     type ScalarT = Scalar;
 
-    fn curve_order() -> &'static [u8] {
+    fn curve_order_bytes() -> &'static [u8] {
         #[rustfmt::skip]
         const CURVE_ORDER: [u8; 32] = [
             0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
@@ -25,7 +26,7 @@ impl TrCurve for Curve25519 {
         &CURVE_ORDER
     }
 
-    fn field_order() -> &'static [u8] {
+    fn field_order_bytes() -> &'static [u8] {
         #[rustfmt::skip]
         const FIELD_ORDER: [u8; 32] = [
             0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -34,6 +35,18 @@ impl TrCurve for Curve25519 {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xed,
         ];
         &FIELD_ORDER
+    }
+
+    fn curve_order() -> &'static Integer {
+        static N: LazyLock<Integer> =
+            LazyLock::new(|| Integer::from_digits(Curve25519::curve_order_bytes(), Order::Msf));
+        return &N;
+    }
+    
+    fn field_order() -> &'static Integer {
+        static P: LazyLock<Integer> =
+            LazyLock::new(|| Integer::from_digits(Curve25519::field_order_bytes(), Order::Msf));
+        return &P;
     }
 
     fn generator() -> &'static Self::PointT {

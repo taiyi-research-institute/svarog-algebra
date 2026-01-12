@@ -1,13 +1,16 @@
 use std::fmt::Debug;
 
+use rug::Integer;
 use serde::{Deserialize, Serialize};
 
 pub trait TrCurve: Sized {
     type PointT: TrPoint<Self> + Default;
     type ScalarT: TrScalar<Self> + Default;
 
-    fn curve_order() -> &'static [u8];
-    fn field_order() -> &'static [u8];
+    fn curve_order_bytes() -> &'static [u8];
+    fn curve_order() -> &'static Integer;
+    fn field_order_bytes() -> &'static [u8];
+    fn field_order() -> &'static Integer;
     fn generator() -> &'static Self::PointT;
     fn identity() -> &'static Self::PointT;
     fn zero() -> &'static Self::ScalarT;
@@ -23,6 +26,8 @@ pub trait TrScalar<C: TrCurve>:
     fn new_rand() -> Self;
     fn new_from_bytes(buf: &[u8]) -> Self;
     fn to_bytes(&self) -> Vec<u8>;
+    fn new_from_int(x: impl Into<Integer>) -> Self;
+    fn to_int(&self) -> Integer;
 
     fn add(&self, other: &Self) -> Self;
     fn neg(&self) -> Self;

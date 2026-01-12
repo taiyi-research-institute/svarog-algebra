@@ -3,6 +3,7 @@ use std::sync::LazyLock;
 use crate::{Point, Scalar};
 
 use curve_abstract::{self as abs, TrPoint};
+use rug::{Integer, integer::Order};
 use secp256k1_sys as ffi;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +14,7 @@ impl abs::TrCurve for Secp256k1 {
     type PointT = Point;
     type ScalarT = Scalar;
 
-    fn curve_order() -> &'static [u8] {
+    fn curve_order_bytes() -> &'static [u8] {
         #[rustfmt::skip]
         const CURVE_ORDER: [u8; 32] = [
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -24,7 +25,7 @@ impl abs::TrCurve for Secp256k1 {
         &CURVE_ORDER
     }
 
-    fn field_order() -> &'static [u8] {
+    fn field_order_bytes() -> &'static [u8] {
         #[rustfmt::skip]
         const FIELD_ORDER: [u8; 32] = [
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -33,6 +34,18 @@ impl abs::TrCurve for Secp256k1 {
             0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xfc, 0x2f
         ];
         &FIELD_ORDER
+    }
+
+    fn curve_order() -> &'static Integer {
+        static N: LazyLock<Integer> =
+            LazyLock::new(|| Integer::from_digits(Secp256k1::curve_order_bytes(), Order::Msf));
+        return &N;
+    }
+
+    fn field_order() -> &'static Integer {
+        static P: LazyLock<Integer> =
+            LazyLock::new(|| Integer::from_digits(Secp256k1::field_order_bytes(), Order::Msf));
+        return &P;
     }
 
     fn generator() -> &'static Point {
