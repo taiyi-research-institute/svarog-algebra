@@ -14,10 +14,8 @@ edition = "2024"
 
 [dependencies]
 anyhow = { version = "1.0.99", features = ["backtrace"] }
-blake2 = "0.10.6"
 clap = "4.5.47"
 classgroup = { path = "../classgroup" }
 indicatif = { version = "0.18.0" }
 memmap2 = "0.9.8"
-moka = { version = "0.12.10", features = ["sync"] }
-rug = { version = "1.28.0", features = ["serde"] }
+rug = { version = "1.28.1", features = ["serde"] }

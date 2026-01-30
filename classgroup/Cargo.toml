@@ -5,10 +5,8 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.99"
-bitvec = { version = "1.0.1", features = ["serde"] }
-once_cell = "1.21.3"
 rand = "*"
-rug = { version = "1.28.0", features = ["serde"] }
+rug = { version = "1.28.1", features = ["serde"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde-pickle = "1.2.0"
 
