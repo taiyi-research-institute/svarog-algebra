@@ -1,9 +1,7 @@
-use std::sync::LazyLock;
-
 use curve_abstract::{TrCurve, TrScalar};
 use curve25519_dalek::Scalar as EdwardScalar;
 use rand::RngCore;
-use rug::{Integer, integer::Order};
+use rug::Integer;
 use serde::{Deserialize, Serialize};
 
 use crate::Curve25519;
@@ -47,10 +45,8 @@ impl TrScalar<Curve25519> for Scalar {
 
     #[inline]
     fn new_from_int(x: impl Into<Integer>) -> Self {
-        static N: LazyLock<Integer> =
-            LazyLock::new(|| Integer::from_digits(&Curve25519::curve_order_bytes(), Order::Msf));
         let x: Integer = x.into();
-        let x = x.modulo(&N);
+        let x = x.modulo(Curve25519::curve_order());
         let buf = x.to_digits::<u8>(rug::integer::Order::Lsf);
         return Self::new_from_bytes(&buf);
     }
