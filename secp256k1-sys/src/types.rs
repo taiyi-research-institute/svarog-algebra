@@ -23,9 +23,7 @@ pub use core::ffi::c_void;
 pub struct AlignedType([u8; 16]);
 
 impl AlignedType {
-    pub fn zeroed() -> Self {
-        AlignedType([0u8; 16])
-    }
+    pub fn zeroed() -> Self { AlignedType([0u8; 16]) }
 
     /// A static zeroed out AlignedType for use in static assignments of [AlignedType; _]
     pub const ZERO: AlignedType = AlignedType([0u8; 16]);
@@ -37,10 +35,11 @@ pub(crate) const ALIGN_TO: usize = core::mem::align_of::<AlignedType>();
 #[cfg(test)]
 mod tests {
     extern crate libc;
-    use crate::{types, AlignedType};
     use std::any::TypeId;
     use std::mem;
     use std::os::raw;
+
+    use crate::{types, AlignedType};
 
     #[test]
     fn verify_types() {

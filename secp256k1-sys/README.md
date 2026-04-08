@@ -1,52 +1,50 @@
-<div align="center">
-  <h1>Rust secp256k1-sys</h1>
 
-  <p>
-    <a href="https://crates.io/crates/secp256k1-sys"><img alt="Crate Info" src="https://img.shields.io/crates/v/secp256k1-sys.svg"/></a>
-    <a href="https://github.com/rust-bitcoin/rust-secp256k1/blob/master/LICENSE"><img alt="CC0 1.0 Universal Licensed" src="https://img.shields.io/badge/license-CC0--1.0-blue.svg"/></a>
-    <a href="https://docs.rs/secp256k1"><img alt="API Docs" src="https://img.shields.io/badge/docs.rs-secp256k1-green"/></a>
-    <a href="https://blog.rust-lang.org/2020/02/27/Rust-1.56.1.html"><img alt="Rustc Version 1.56.1+" src="https://img.shields.io/badge/rustc-1.56.1%2B-lightgrey.svg"/></a>
-  </p>
-</div>
 
-Provides low-level bindings to the C FFI exposed by [libsecp256k1](https://github.com/bitcoin-core/secp256k1).
+# secp256k1-sys 自定义 Patch 记录
 
-## Vendoring
+本 crate 基于上游 [rust-bitcoin/rust-secp256k1](https://github.com/rust-bitcoin/rust-secp256k1/) 的 `secp256k1-sys`，在其基础上做了以下自定义修改。
 
-The default build process is to build using the vendored `libsecp256k1` sources in the `depend`
-directory. These sources are prefixed with a special rust-secp256k1-sys-specific prefix
-`rustsecp256k1_v1_2_3_`.
+**当前基线版本**：`0.13.0`（2026-04 升级，从 0.11.0）
 
-This prefix ensures that no symbol collision can happen:
+## Patch 清单
 
-- When a Rust project has two different versions of `rust-secp256k1` in its depepdency tree, or
-- When `rust-secp256k1` is used for building a static library in a context where existing
-  `libsecp256k1` symbols are already linked.
+### 1. `PublicKey::serialize` 改为 `pub`
 
-To update the vendored sources, use the `vendor-libsecp.sh` script: `./vendor-libsecp.sh <rev>`
+- **文件**：`src/lib.rs`
+- **改动**：`fn serialize(&self) -> [u8; 33]` → `pub fn serialize(&self) -> [u8; 33]`
+- **原因**：上游将该方法限制为 crate-private，我们需要在外部直接序列化 `PublicKey`。
 
-- Where `<rev>` is the git revision of `libsecp256k1` to checkout. If you do not specify a revision,
-  the script will simply clone the repo and use whatever revision the default branch is pointing to.
+### 2. 新增 `secp256k1_ec_seckey_invert_ct` / `secp256k1_ec_seckey_invert_vt`
 
-## Linking to external symbols
+- **文件**：
+  - `src/lib.rs`（FFI 声明）
+  - `depend/secp256k1/include/secp256k1.h`（C 头文件声明）
+  - `depend/secp256k1/src/secp256k1.c`（C 实现）
+- **改动**：新增两个函数，对私钥做模曲线阶的乘法逆元。`_ct` 为常量时间（使用 `scalar_inverse`），`_vt` 为变量时间（使用 `scalar_inverse_var`）。
+- **原因**：上游 libsecp256k1 不提供私钥逆元 API，我们的 MPC 协议需要此操作。
 
-**Danger: doing this incorrectly may have catastrophic consequences!**
+### 3. `ec_pubkey_combine` 允许求和为无穷远点
 
-This is mainly intended for applications consisting of various programming languages that intend to
-link the same library to save space, or bundles of multiple binaries coming from the same source. Do
-not use this to link to a random secp256k1 library you found in your OS! If you are packaging
-software that depends on `rust-secp256k1`, using this flag to link to another package, make sure you
-stay within the binary compatibility guarantees of that package. For example, in Debian if you need
-`libsecp256k1 1.2.3`, make sure your package requires a version strictly`>= 1.2.3 << 1.2.4`. Note
-also that unless you're packaging the library for an official repository you should prefix your
-package and the library with a string specific to you. E.g. if you have a set of packages called
-`my-awesome-packages` you should package `libsecp256k1` as `libmy-awesome-packages-secp256k1` and
-depend on that library/package name from your application.
+- **文件**：`depend/secp256k1/src/secp256k1.c`
+- **改动**：原版在求和结果为无穷远点（identity）时返回 0（失败），改为返回 1（成功）。
+- **原因**：MPC 签名中间步骤可能出现公钥相加为零的合法情况，原版行为会误报错误。
 
-If you want to compile this library without using the bundled symbols (which may be required for
-integration into other build systems), you can do so by adding `--cfg=rust_secp_no_symbol_renaming'`
-to your `RUSTFLAGS` variable.
+### 4. 绕过 MuSig2 模块
 
-## Minimum Supported Rust Version
+- **文件**：`build.rs`（移除 `ENABLE_MODULE_MUSIG`）、`src/lib.rs`（移除所有 `Musig*` 类型和 FFI 函数）
+- **原因**：当前不需要 Schnorr 多签，减少编译时间和攻击面。
+- **注意**：vendored C 源码中的 musig 文件仍保留，只是不编译。如需启用，在 `build.rs` 加回 `.define("ENABLE_MODULE_MUSIG", Some("1"))` 并在 `lib.rs` 补回类型和 FFI 声明。
 
-This library should always compile with any combination of features on **Rust 1.56.1**.
+## 升级指南
+
+从上游新版本升级时：
+
+1. 下载新版 crate：`curl -sL "https://crates.io/api/v1/crates/secp256k1-sys/VERSION/download" | tar xzf -`
+2. 替换 `depend/`、`src/`、`build.rs`、`Cargo.toml` 为新版文件
+3. 按上述 Patch 清单逐条重新应用：
+   - `src/lib.rs`：`PublicKey::serialize` 改 `pub`；添加 `seckey_invert_ct/vt` FFI 声明；`ec_pubkey_combine` 加注释；删除 MuSig2 类型和 FFI
+   - `build.rs`：删除 `ENABLE_MODULE_MUSIG` 行
+   - `depend/secp256k1/include/secp256k1.h`：添加 `invert_ct/vt` 函数声明
+   - `depend/secp256k1/src/secp256k1.c`：添加 `invert_ct/vt` 实现；修改 `ec_pubkey_combine` 的 infinity 检查
+4. **注意 symbol prefix**：每个大版本的符号前缀不同（如 `rustsecp256k1_v0_13_`），需要同步更新所有 C 函数名和 Rust `link_name`
+5. 运行 `cargo build` 验证编译通过

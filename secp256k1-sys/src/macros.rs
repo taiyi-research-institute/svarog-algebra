@@ -27,9 +27,7 @@ macro_rules! impl_array_newtype {
             /// serializing it to a guaranteed format). This means they may be slow, this function
             /// provides a faster equality check if you know that your types come from the same
             /// library version.
-            pub fn eq_fast_unstable(&self, other: &Self) -> bool {
-                self[..].eq(&other[..])
-            }
+            pub fn eq_fast_unstable(&self, other: &Self) -> bool { self[..].eq(&other[..]) }
         }
 
         impl AsRef<[$ty; $len]> for $thing {
@@ -48,9 +46,7 @@ macro_rules! impl_array_newtype {
             type Output = <[$ty] as core::ops::Index<I>>::Output;
 
             #[inline]
-            fn index(&self, index: I) -> &Self::Output {
-                &self.0[index]
-            }
+            fn index(&self, index: I) -> &Self::Output { &self.0[index] }
         }
 
         impl $crate::CPtr for $thing {

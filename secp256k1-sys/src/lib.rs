@@ -5,14 +5,8 @@
 //! not be needed for most users.
 
 // Coding conventions
-#![deny(
-    non_upper_case_globals,
-    non_camel_case_types,
-    non_snake_case,
-    unused_mut
-)]
+#![deny(non_upper_case_globals, non_camel_case_types, non_snake_case, unused_mut)]
 #![cfg_attr(all(not(test), not(feature = "std")), no_std)]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(any(test, feature = "std"))]
 extern crate core;
@@ -31,6 +25,7 @@ pub mod recovery;
 
 use core::ptr::NonNull;
 use core::{ptr, slice};
+
 use types::*;
 
 /// Flag for context to enable no precomputation
@@ -41,7 +36,7 @@ pub const SECP256K1_START_VERIFY: c_uint = 1 | (1 << 8);
 pub const SECP256K1_START_SIGN: c_uint = 1 | (1 << 9);
 /// Flag for keys to indicate uncompressed serialization format
 #[allow(unused_parens)]
-pub const SECP256K1_SER_UNCOMPRESSED: c_uint = 1 << 1;
+pub const SECP256K1_SER_UNCOMPRESSED: c_uint = (1 << 1);
 /// Flag for keys to indicate compressed serialization format
 pub const SECP256K1_SER_COMPRESSED: c_uint = (1 << 1) | (1 << 8);
 
@@ -128,11 +123,7 @@ impl SchnorrSigExtraParams {
     /// then ndata must be a pointer to 32-byte auxiliary randomness as per
     /// BIP-340.
     pub fn new(nonce_fp: SchnorrNonceFn, ndata: *const c_void) -> Self {
-        SchnorrSigExtraParams {
-            magic: [0xda, 0x6f, 0xb3, 0x8c],
-            nonce_fp,
-            ndata,
-        }
+        SchnorrSigExtraParams { magic: [0xda, 0x6f, 0xb3, 0x8c], nonce_fp, ndata }
     }
 }
 
@@ -169,9 +160,7 @@ impl PublicKey {
     /// If you pass this to any FFI functions, except as an out-pointer,
     /// the result is likely to be an assertation failure and process
     /// termination.
-    pub unsafe fn new() -> Self {
-        Self::from_array_unchecked([0; 64])
-    }
+    pub unsafe fn new() -> Self { Self::from_array_unchecked([0; 64]) }
 
     /// Create a new public key usable for the FFI interface from raw bytes
     ///
@@ -182,17 +171,13 @@ impl PublicKey {
     /// the underlying library. You should not use this method except with data
     /// that you obtained from the FFI interface of the same version of this
     /// library.
-    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self {
-        PublicKey(data)
-    }
+    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self { PublicKey(data) }
 
     /// Returns the underlying FFI opaque representation of the public key
     ///
     /// You should not use this unless you really know what you are doing. It is
     /// essentially only useful for extending the FFI interface itself.
-    pub fn underlying_bytes(self) -> [c_uchar; 64] {
-        self.0
-    }
+    pub fn underlying_bytes(self) -> [c_uchar; 64] { self.0 }
 
     /// Serializes this public key as a byte-encoded pair of values, in compressed form.
     pub fn serialize(&self) -> [u8; 33] {
@@ -208,7 +193,7 @@ impl PublicKey {
             );
             debug_assert_eq!(ret, 1);
             debug_assert_eq!(len, 33);
-        }
+        };
         buf
     }
 }
@@ -230,9 +215,7 @@ impl Ord for PublicKey {
 
 #[cfg(not(secp256k1_fuzz))]
 impl PartialEq for PublicKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.cmp(other) == core::cmp::Ordering::Equal
-    }
+    fn eq(&self, other: &Self) -> bool { self.cmp(other) == core::cmp::Ordering::Equal }
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -262,9 +245,7 @@ impl Signature {
     /// If you pass this to any FFI functions, except as an out-pointer,
     /// the result is likely to be an assertation failure and process
     /// termination.
-    pub unsafe fn new() -> Self {
-        Self::from_array_unchecked([0; 64])
-    }
+    pub unsafe fn new() -> Self { Self::from_array_unchecked([0; 64]) }
 
     /// Create a new signature usable for the FFI interface from raw bytes
     ///
@@ -275,17 +256,13 @@ impl Signature {
     /// the underlying library. You should not use this method except with data
     /// that you obtained from the FFI interface of the same version of this
     /// library.
-    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self {
-        Signature(data)
-    }
+    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self { Signature(data) }
 
     /// Returns the underlying FFI opaque representation of the signature
     ///
     /// You should not use this unless you really know what you are doing. It is
     /// essentially only useful for extending the FFI interface itself.
-    pub fn underlying_bytes(self) -> [c_uchar; 64] {
-        self.0
-    }
+    pub fn underlying_bytes(self) -> [c_uchar; 64] { self.0 }
 
     /// Serializes the signature in compact format.
     fn serialize(&self) -> [u8; 64] {
@@ -320,9 +297,7 @@ impl Ord for Signature {
 
 #[cfg(not(secp256k1_fuzz))]
 impl PartialEq for Signature {
-    fn eq(&self, other: &Self) -> bool {
-        self.cmp(other) == core::cmp::Ordering::Equal
-    }
+    fn eq(&self, other: &Self) -> bool { self.cmp(other) == core::cmp::Ordering::Equal }
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -351,9 +326,7 @@ impl XOnlyPublicKey {
     /// If you pass this to any FFI functions, except as an out-pointer,
     /// the result is likely to be an assertation failure and process
     /// termination.
-    pub unsafe fn new() -> Self {
-        Self::from_array_unchecked([0; 64])
-    }
+    pub unsafe fn new() -> Self { Self::from_array_unchecked([0; 64]) }
 
     /// Create a new x-only public key usable for the FFI interface from raw bytes
     ///
@@ -364,17 +337,13 @@ impl XOnlyPublicKey {
     /// the underlying library. You should not use this method except with data
     /// that you obtained from the FFI interface of the same version of this
     /// library.
-    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self {
-        XOnlyPublicKey(data)
-    }
+    pub unsafe fn from_array_unchecked(data: [c_uchar; 64]) -> Self { XOnlyPublicKey(data) }
 
     /// Returns the underlying FFI opaque representation of the x-only public key
     ///
     /// You should not use this unless you really know what you are doing. It is
     /// essentially only useful for extending the FFI interface itself.
-    pub fn underlying_bytes(self) -> [c_uchar; 64] {
-        self.0
-    }
+    pub fn underlying_bytes(self) -> [c_uchar; 64] { self.0 }
 
     /// Serializes this key as a byte-encoded x coordinate value (32 bytes).
     fn serialize(&self) -> [u8; 32] {
@@ -386,7 +355,7 @@ impl XOnlyPublicKey {
                 self,
             );
             assert_eq!(ret, 1);
-        }
+        };
         buf
     }
 }
@@ -408,9 +377,7 @@ impl Ord for XOnlyPublicKey {
 
 #[cfg(not(secp256k1_fuzz))]
 impl PartialEq for XOnlyPublicKey {
-    fn eq(&self, other: &Self) -> bool {
-        self.cmp(other) == core::cmp::Ordering::Equal
-    }
+    fn eq(&self, other: &Self) -> bool { self.cmp(other) == core::cmp::Ordering::Equal }
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -439,9 +406,7 @@ impl Keypair {
     /// If you pass this to any FFI functions, except as an out-pointer,
     /// the result is likely to be an assertation failure and process
     /// termination.
-    pub unsafe fn new() -> Self {
-        Self::from_array_unchecked([0; 96])
-    }
+    pub unsafe fn new() -> Self { Self::from_array_unchecked([0; 96]) }
 
     /// Create a new keypair usable for the FFI interface from raw bytes
     ///
@@ -452,17 +417,13 @@ impl Keypair {
     /// the underlying library. You should not use this method except with data
     /// that you obtained from the FFI interface of the same version of this
     /// library.
-    pub unsafe fn from_array_unchecked(data: [c_uchar; 96]) -> Self {
-        Keypair(data)
-    }
+    pub unsafe fn from_array_unchecked(data: [c_uchar; 96]) -> Self { Keypair(data) }
 
     /// Returns the underlying FFI opaque representation of the x-only public key
     ///
     /// You should not use this unless you really know what you are doing. It is
     /// essentially only useful for extending the FFI interface itself.
-    pub fn underlying_bytes(self) -> [c_uchar; 96] {
-        self.0
-    }
+    pub fn underlying_bytes(self) -> [c_uchar; 96] { self.0 }
 
     /// Creates a new compressed public key from this key pair.
     fn public_key(&self) -> PublicKey {
@@ -481,9 +442,7 @@ impl Keypair {
     /// is very subtle. For more discussion on this, please see the documentation
     /// of the [`zeroize`](https://docs.rs/zeroize) crate.
     #[inline]
-    pub fn non_secure_erase(&mut self) {
-        non_secure_erase_impl(&mut self.0, DUMMY_KEYPAIR);
-    }
+    pub fn non_secure_erase(&mut self) { non_secure_erase_impl(&mut self.0, DUMMY_KEYPAIR); }
 }
 
 // DUMMY_KEYPAIR is the internal repr of a valid key pair with secret key `[1u8; 32]`
@@ -529,9 +488,7 @@ pub fn non_secure_erase_impl<T>(dst: &mut T, src: T) {
 
 #[cfg(not(secp256k1_fuzz))]
 impl PartialOrd for Keypair {
-    fn partial_cmp(&self, other: &Keypair) -> Option<core::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
+    fn partial_cmp(&self, other: &Keypair) -> Option<core::cmp::Ordering> { Some(self.cmp(other)) }
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -545,9 +502,7 @@ impl Ord for Keypair {
 
 #[cfg(not(secp256k1_fuzz))]
 impl PartialEq for Keypair {
-    fn eq(&self, other: &Self) -> bool {
-        self.cmp(other) == core::cmp::Ordering::Equal
-    }
+    fn eq(&self, other: &Self) -> bool { self.cmp(other) == core::cmp::Ordering::Equal }
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -571,12 +526,8 @@ impl core::hash::Hash for Keypair {
 pub struct ElligatorSwift([u8; 64]);
 
 impl ElligatorSwift {
-    pub fn from_array(arr: [u8; 64]) -> Self {
-        ElligatorSwift(arr)
-    }
-    pub fn to_array(self) -> [u8; 64] {
-        self.0
-    }
+    pub fn from_array(arr: [u8; 64]) -> Self { ElligatorSwift(arr) }
+    pub fn to_array(self) -> [u8; 64] { self.0 }
 }
 
 impl_array_newtype!(ElligatorSwift, u8, 64);
@@ -586,52 +537,52 @@ extern "C" {
     /// Default ECDH hash function
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdh_hash_function_default"
+        link_name = "rustsecp256k1_v0_13_ecdh_hash_function_default"
     )]
     pub static secp256k1_ecdh_hash_function_default: EcdhHashFn;
 
     /// Default ECDH hash function for BIP324 key establishment
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ellswift_xdh_hash_function_bip324"
+        link_name = "rustsecp256k1_v0_13_ellswift_xdh_hash_function_bip324"
     )]
     pub static secp256k1_ellswift_xdh_hash_function_bip324: EllswiftEcdhHashFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_nonce_function_rfc6979"
+        link_name = "rustsecp256k1_v0_13_nonce_function_rfc6979"
     )]
     pub static secp256k1_nonce_function_rfc6979: NonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_nonce_function_default"
+        link_name = "rustsecp256k1_v0_13_nonce_function_default"
     )]
     pub static secp256k1_nonce_function_default: NonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_nonce_function_bip340"
+        link_name = "rustsecp256k1_v0_13_nonce_function_bip340"
     )]
     pub static secp256k1_nonce_function_bip340: SchnorrNonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_no_precomp"
+        link_name = "rustsecp256k1_v0_13_context_no_precomp"
     )]
     pub static secp256k1_context_no_precomp: *const Context;
 
     // Contexts
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_preallocated_destroy"
+        link_name = "rustsecp256k1_v0_13_context_preallocated_destroy"
     )]
     pub fn secp256k1_context_preallocated_destroy(cx: NonNull<Context>);
 
     // Signatures
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_parse_der"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_der"
     )]
     pub fn secp256k1_ecdsa_signature_parse_der(
         cx: *const Context,
@@ -642,7 +593,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_parse_compact"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_compact"
     )]
     pub fn secp256k1_ecdsa_signature_parse_compact(
         cx: *const Context,
@@ -652,7 +603,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_parse_der_lax"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_der_lax"
     )]
     pub fn ecdsa_signature_parse_der_lax(
         cx: *const Context,
@@ -663,7 +614,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_serialize_der"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_serialize_der"
     )]
     pub fn secp256k1_ecdsa_signature_serialize_der(
         cx: *const Context,
@@ -674,7 +625,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_serialize_compact"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_serialize_compact"
     )]
     pub fn secp256k1_ecdsa_signature_serialize_compact(
         cx: *const Context,
@@ -684,7 +635,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_signature_normalize"
+        link_name = "rustsecp256k1_v0_13_ecdsa_signature_normalize"
     )]
     pub fn secp256k1_ecdsa_signature_normalize(
         cx: *const Context,
@@ -695,31 +646,31 @@ extern "C" {
     // Secret Keys
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_verify"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_verify"
     )]
     pub fn secp256k1_ec_seckey_verify(cx: *const Context, sk: *const c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_negate"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_negate"
     )]
     pub fn secp256k1_ec_seckey_negate(cx: *const Context, sk: *mut c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_invert_ct"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_invert_ct"
     )]
     pub fn secp256k1_ec_seckey_invert_ct(cx: *const Context, sk: *mut c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_invert_vt"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_invert_vt"
     )]
     pub fn secp256k1_ec_seckey_invert_vt(cx: *const Context, sk: *mut c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_tweak_add"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_tweak_add"
     )]
     pub fn secp256k1_ec_seckey_tweak_add(
         cx: *const Context,
@@ -728,7 +679,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_seckey_tweak_mul"
+        link_name = "rustsecp256k1_v0_13_ec_seckey_tweak_mul"
     )]
     pub fn secp256k1_ec_seckey_tweak_mul(
         cx: *const Context,
@@ -736,20 +687,14 @@ extern "C" {
         tweak: *const c_uchar,
     ) -> c_int;
 
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_keypair_sec"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_sec")]
     pub fn secp256k1_keypair_sec(
         cx: *const Context,
         output_seckey: *mut c_uchar,
         keypair: *const Keypair,
     ) -> c_int;
 
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_keypair_pub"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_pub")]
     pub fn secp256k1_keypair_pub(
         cx: *const Context,
         output_pubkey: *mut PublicKey,
@@ -758,7 +703,7 @@ extern "C" {
     // Elligator Swift
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ellswift_encode"
+        link_name = "rustsecp256k1_v0_13_ellswift_encode"
     )]
     pub fn secp256k1_ellswift_encode(
         ctx: *const Context,
@@ -768,7 +713,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ellswift_decode"
+        link_name = "rustsecp256k1_v0_13_ellswift_decode"
     )]
     pub fn secp256k1_ellswift_decode(
         ctx: *const Context,
@@ -777,7 +722,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ellswift_create"
+        link_name = "rustsecp256k1_v0_13_ellswift_create"
     )]
     pub fn secp256k1_ellswift_create(
         ctx: *const Context,
@@ -785,10 +730,7 @@ extern "C" {
         seckey32: *const c_uchar,
         aux_rand32: *const c_uchar,
     ) -> c_int;
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ellswift_xdh"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ellswift_xdh")]
     pub fn secp256k1_ellswift_xdh(
         ctx: *const Context,
         output: *mut c_uchar,
@@ -799,6 +741,7 @@ extern "C" {
         hashfp: EllswiftEcdhHashFn,
         data: *mut c_void,
     ) -> c_int;
+
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -806,13 +749,13 @@ extern "C" {
     // Contexts
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_preallocated_size"
+        link_name = "rustsecp256k1_v0_13_context_preallocated_size"
     )]
     pub fn secp256k1_context_preallocated_size(flags: c_uint) -> size_t;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_preallocated_create"
+        link_name = "rustsecp256k1_v0_13_context_preallocated_create"
     )]
     pub fn secp256k1_context_preallocated_create(
         prealloc: NonNull<c_void>,
@@ -821,13 +764,13 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_preallocated_clone_size"
+        link_name = "rustsecp256k1_v0_13_context_preallocated_clone_size"
     )]
     pub fn secp256k1_context_preallocated_clone_size(cx: *const Context) -> size_t;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_preallocated_clone"
+        link_name = "rustsecp256k1_v0_13_context_preallocated_clone"
     )]
     pub fn secp256k1_context_preallocated_clone(
         cx: *const Context,
@@ -836,13 +779,13 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_context_randomize"
+        link_name = "rustsecp256k1_v0_13_context_randomize"
     )]
     pub fn secp256k1_context_randomize(cx: NonNull<Context>, seed32: *const c_uchar) -> c_int;
     // Pubkeys
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_parse"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_parse"
     )]
     pub fn secp256k1_ec_pubkey_parse(
         cx: *const Context,
@@ -853,7 +796,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_serialize"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_serialize"
     )]
     pub fn secp256k1_ec_pubkey_serialize(
         cx: *const Context,
@@ -866,7 +809,7 @@ extern "C" {
     // EC
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_create"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_create"
     )]
     pub fn secp256k1_ec_pubkey_create(
         cx: *const Context,
@@ -876,14 +819,11 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_negate"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_negate"
     )]
     pub fn secp256k1_ec_pubkey_negate(cx: *const Context, pk: *mut PublicKey) -> c_int;
 
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_cmp"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ec_pubkey_cmp")]
     pub fn secp256k1_ec_pubkey_cmp(
         cx: *const Context,
         pubkey1: *const PublicKey,
@@ -892,7 +832,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_tweak_add"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_tweak_add"
     )]
     pub fn secp256k1_ec_pubkey_tweak_add(
         cx: *const Context,
@@ -902,7 +842,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_tweak_mul"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_tweak_mul"
     )]
     pub fn secp256k1_ec_pubkey_tweak_mul(
         cx: *const Context,
@@ -910,10 +850,10 @@ extern "C" {
         tweak: *const c_uchar,
     ) -> c_int;
 
-    // My modified version allows summing to zero.
+    // Custom patch: C implementation modified to allow summing to the point at infinity.
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ec_pubkey_combine"
+        link_name = "rustsecp256k1_v0_13_ec_pubkey_combine"
     )]
     pub fn secp256k1_ec_pubkey_combine(
         cx: *const Context,
@@ -922,10 +862,7 @@ extern "C" {
         n: size_t,
     ) -> c_int;
 
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdh"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdh")]
     pub fn secp256k1_ecdh(
         cx: *const Context,
         output: *mut c_uchar,
@@ -936,10 +873,7 @@ extern "C" {
     ) -> c_int;
 
     // ECDSA
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_verify"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdsa_verify")]
     pub fn secp256k1_ecdsa_verify(
         cx: *const Context,
         sig: *const Signature,
@@ -947,10 +881,7 @@ extern "C" {
         pk: *const PublicKey,
     ) -> c_int;
 
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_ecdsa_sign"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdsa_sign")]
     pub fn secp256k1_ecdsa_sign(
         cx: *const Context,
         sig: *mut Signature,
@@ -963,7 +894,7 @@ extern "C" {
     // Schnorr Signatures
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_schnorrsig_sign"
+        link_name = "rustsecp256k1_v0_13_schnorrsig_sign"
     )]
     pub fn secp256k1_schnorrsig_sign(
         cx: *const Context,
@@ -976,7 +907,7 @@ extern "C" {
     // Schnorr Signatures with extra parameters (see [`SchnorrSigExtraParams`])
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_schnorrsig_sign_custom"
+        link_name = "rustsecp256k1_v0_13_schnorrsig_sign_custom"
     )]
     pub fn secp256k1_schnorrsig_sign_custom(
         cx: *const Context,
@@ -989,7 +920,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_schnorrsig_verify"
+        link_name = "rustsecp256k1_v0_13_schnorrsig_verify"
     )]
     pub fn secp256k1_schnorrsig_verify(
         cx: *const Context,
@@ -1000,10 +931,7 @@ extern "C" {
     ) -> c_int;
 
     // Extra keys
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_keypair_create"
-    )]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_create")]
     pub fn secp256k1_keypair_create(
         cx: *const Context,
         keypair: *mut Keypair,
@@ -1012,7 +940,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_parse"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_parse"
     )]
     pub fn secp256k1_xonly_pubkey_parse(
         cx: *const Context,
@@ -1022,7 +950,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_serialize"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_serialize"
     )]
     pub fn secp256k1_xonly_pubkey_serialize(
         cx: *const Context,
@@ -1032,7 +960,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_from_pubkey"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_from_pubkey"
     )]
     pub fn secp256k1_xonly_pubkey_from_pubkey(
         cx: *const Context,
@@ -1043,7 +971,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_cmp"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_cmp"
     )]
     pub fn secp256k1_xonly_pubkey_cmp(
         cx: *const Context,
@@ -1053,7 +981,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_tweak_add"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_tweak_add"
     )]
     pub fn secp256k1_xonly_pubkey_tweak_add(
         cx: *const Context,
@@ -1064,7 +992,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_keypair_xonly_pub"
+        link_name = "rustsecp256k1_v0_13_keypair_xonly_pub"
     )]
     pub fn secp256k1_keypair_xonly_pub(
         cx: *const Context,
@@ -1075,7 +1003,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_keypair_xonly_tweak_add"
+        link_name = "rustsecp256k1_v0_13_keypair_xonly_tweak_add"
     )]
     pub fn secp256k1_keypair_xonly_tweak_add(
         cx: *const Context,
@@ -1085,7 +1013,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_11_xonly_pubkey_tweak_add_check"
+        link_name = "rustsecp256k1_v0_13_xonly_pubkey_tweak_add_check"
     )]
     pub fn secp256k1_xonly_pubkey_tweak_add_check(
         cx: *const Context,
@@ -1113,7 +1041,7 @@ extern "C" {
 /// The newly created secp256k1 raw context.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
 pub unsafe fn secp256k1_context_create(flags: c_uint) -> NonNull<Context> {
-    rustsecp256k1_v0_11_context_create(flags)
+    rustsecp256k1_v0_13_context_create(flags)
 }
 
 /// A reimplementation of the C function `secp256k1_context_create` in rust.
@@ -1122,9 +1050,10 @@ pub unsafe fn secp256k1_context_create(flags: c_uint) -> NonNull<Context> {
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)] // Documented above.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
-pub unsafe extern "C" fn rustsecp256k1_v0_11_context_create(flags: c_uint) -> NonNull<Context> {
-    use crate::alloc::alloc;
+pub unsafe extern "C" fn rustsecp256k1_v0_13_context_create(flags: c_uint) -> NonNull<Context> {
     use core::mem;
+
+    use crate::alloc::alloc;
     assert!(ALIGN_TO >= mem::align_of::<usize>());
     assert!(ALIGN_TO >= mem::align_of::<&usize>());
     assert!(ALIGN_TO >= mem::size_of::<usize>());
@@ -1155,13 +1084,13 @@ pub unsafe extern "C" fn rustsecp256k1_v0_11_context_create(flags: c_uint) -> No
 ///  `ctx` must be a valid pointer to a block of memory created using [`secp256k1_context_create`].
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
 pub unsafe fn secp256k1_context_destroy(ctx: NonNull<Context>) {
-    rustsecp256k1_v0_11_context_destroy(ctx)
+    rustsecp256k1_v0_13_context_destroy(ctx)
 }
 
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)] // Documented above.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
-pub unsafe extern "C" fn rustsecp256k1_v0_11_context_destroy(mut ctx: NonNull<Context>) {
+pub unsafe extern "C" fn rustsecp256k1_v0_13_context_destroy(mut ctx: NonNull<Context>) {
     use crate::alloc::alloc;
     secp256k1_context_preallocated_destroy(ctx);
     let ctx: *mut Context = ctx.as_mut();
@@ -1197,7 +1126,7 @@ pub unsafe extern "C" fn rustsecp256k1_v0_11_context_destroy(mut ctx: NonNull<Co
 /// For exact safety constraints see [`std::slice::from_raw_parts`] and [`std::str::from_utf8_unchecked`].
 #[no_mangle]
 #[cfg(not(rust_secp_no_symbol_renaming))]
-pub unsafe extern "C" fn rustsecp256k1_v0_11_default_illegal_callback_fn(
+pub unsafe extern "C" fn rustsecp256k1_v0_13_default_illegal_callback_fn(
     message: *const c_char,
     _data: *mut c_void,
 ) {
@@ -1228,7 +1157,7 @@ pub unsafe extern "C" fn rustsecp256k1_v0_11_default_illegal_callback_fn(
 /// For exact safety constraints see [`std::slice::from_raw_parts`] and [`std::str::from_utf8_unchecked`].
 #[no_mangle]
 #[cfg(not(rust_secp_no_symbol_renaming))]
-pub unsafe extern "C" fn rustsecp256k1_v0_11_default_error_callback_fn(
+pub unsafe extern "C" fn rustsecp256k1_v0_13_default_error_callback_fn(
     message: *const c_char,
     _data: *mut c_void,
 ) {
@@ -1246,7 +1175,7 @@ pub unsafe extern "C" fn rustsecp256k1_v0_11_default_error_callback_fn(
 #[cfg(not(rust_secp_no_symbol_renaming))]
 unsafe fn strlen(mut str_ptr: *const c_char) -> usize {
     let mut ctr = 0;
-    while *str_ptr != ('\0' as c_char) {
+    while *str_ptr != '\0' as c_char {
         ctr += 1;
         str_ptr = str_ptr.offset(1);
     }
@@ -1284,34 +1213,11 @@ impl<T> CPtr for [T] {
     }
 }
 
-impl<T> CPtr for &[T] {
-    type Target = T;
-    fn as_c_ptr(&self) -> *const Self::Target {
-        if self.is_empty() {
-            ptr::null()
-        } else {
-            self.as_ptr()
-        }
-    }
-
-    fn as_mut_c_ptr(&mut self) -> *mut Self::Target {
-        if self.is_empty() {
-            ptr::null_mut()
-        } else {
-            self.as_ptr() as *mut Self::Target
-        }
-    }
-}
-
 impl CPtr for [u8; 32] {
     type Target = u8;
-    fn as_c_ptr(&self) -> *const Self::Target {
-        self.as_ptr()
-    }
+    fn as_c_ptr(&self) -> *const Self::Target { self.as_ptr() }
 
-    fn as_mut_c_ptr(&mut self) -> *mut Self::Target {
-        self.as_mut_ptr()
-    }
+    fn as_mut_c_ptr(&mut self) -> *mut Self::Target { self.as_mut_ptr() }
 }
 
 impl<T: CPtr> CPtr for Option<T> {
@@ -1332,19 +1238,20 @@ impl<T: CPtr> CPtr for Option<T> {
 
 #[cfg(secp256k1_fuzz)]
 mod fuzz_dummy {
-    use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};
+
+    use super::*;
 
     #[cfg(rust_secp_no_symbol_renaming)]
     compile_error!("We do not support fuzzing with rust_secp_no_symbol_renaming");
 
     extern "C" {
-        fn rustsecp256k1_v0_11_context_preallocated_size(flags: c_uint) -> size_t;
-        fn rustsecp256k1_v0_11_context_preallocated_create(
+        fn rustsecp256k1_v0_13_context_preallocated_size(flags: c_uint) -> size_t;
+        fn rustsecp256k1_v0_13_context_preallocated_create(
             prealloc: NonNull<c_void>,
             flags: c_uint,
         ) -> NonNull<Context>;
-        fn rustsecp256k1_v0_11_context_preallocated_clone(
+        fn rustsecp256k1_v0_13_context_preallocated_clone(
             cx: *const Context,
             prealloc: NonNull<c_void>,
         ) -> NonNull<Context>;
@@ -1357,7 +1264,7 @@ mod fuzz_dummy {
     // Contexts
     pub unsafe fn secp256k1_context_preallocated_size(flags: c_uint) -> size_t {
         assert!(
-            rustsecp256k1_v0_11_context_preallocated_size(flags) + std::mem::size_of::<c_uint>()
+            rustsecp256k1_v0_13_context_preallocated_size(flags) + std::mem::size_of::<c_uint>()
                 <= CTX_SIZE
         );
         CTX_SIZE
@@ -1383,13 +1290,13 @@ mod fuzz_dummy {
                 have_ctx = HAVE_PREALLOCATED_CONTEXT.swap(HAVE_CONTEXT_WORKING, Ordering::AcqRel);
                 if have_ctx == HAVE_CONTEXT_NONE {
                     assert!(
-                        rustsecp256k1_v0_11_context_preallocated_size(
+                        rustsecp256k1_v0_13_context_preallocated_size(
                             SECP256K1_START_SIGN | SECP256K1_START_VERIFY
                         ) + std::mem::size_of::<c_uint>()
                             <= CTX_SIZE
                     );
                     assert_eq!(
-                        rustsecp256k1_v0_11_context_preallocated_create(
+                        rustsecp256k1_v0_13_context_preallocated_create(
                             NonNull::new_unchecked(
                                 PREALLOCATED_CONTEXT[..].as_mut_ptr() as *mut c_void
                             ),
@@ -1420,10 +1327,7 @@ mod fuzz_dummy {
             prealloc.as_ptr() as *mut u8,
             CTX_SIZE,
         );
-        let ptr = prealloc
-            .as_ptr()
-            .add(CTX_SIZE)
-            .sub(std::mem::size_of::<c_uint>());
+        let ptr = (prealloc.as_ptr()).add(CTX_SIZE).sub(std::mem::size_of::<c_uint>());
         (ptr as *mut c_uint).write(flags);
         NonNull::new_unchecked(prealloc.as_ptr() as *mut Context)
     }
@@ -1434,15 +1338,12 @@ mod fuzz_dummy {
         cx: *const Context,
         prealloc: NonNull<c_void>,
     ) -> NonNull<Context> {
-        let orig_ptr = (cx as *mut u8)
-            .add(CTX_SIZE)
-            .sub(std::mem::size_of::<c_uint>());
-        let new_ptr = (prealloc.as_ptr() as *mut u8)
-            .add(CTX_SIZE)
-            .sub(std::mem::size_of::<c_uint>());
+        let orig_ptr = (cx as *mut u8).add(CTX_SIZE).sub(std::mem::size_of::<c_uint>());
+        let new_ptr =
+            (prealloc.as_ptr() as *mut u8).add(CTX_SIZE).sub(std::mem::size_of::<c_uint>());
         let flags = (orig_ptr as *mut c_uint).read();
         (new_ptr as *mut c_uint).write(flags);
-        rustsecp256k1_v0_11_context_preallocated_clone(cx, prealloc)
+        rustsecp256k1_v0_13_context_preallocated_clone(cx, prealloc)
     }
 
     pub unsafe fn secp256k1_context_randomize(
@@ -1459,9 +1360,7 @@ mod fuzz_dummy {
         let cx_flags = if cx == secp256k1_context_no_precomp {
             1
         } else {
-            let ptr = (cx as *const u8)
-                .add(CTX_SIZE)
-                .sub(std::mem::size_of::<c_uint>());
+            let ptr = (cx as *const u8).add(CTX_SIZE).sub(std::mem::size_of::<c_uint>());
             (ptr as *const c_uint).read()
         };
         assert_eq!(cx_flags & 1, 1); // SECP256K1_FLAGS_TYPE_CONTEXT
@@ -1471,9 +1370,9 @@ mod fuzz_dummy {
     /// Checks that pk != 0xffff...ffff and pk[1..32] == pk[33..64]
     unsafe fn test_pk_validate(cx: *const Context, pk: *const PublicKey) -> c_int {
         check_context_flags(cx, 0);
-        if (*pk).0[1..32] != (*pk).0[33..64]
-            || ((*pk).0[32] != 0 && (*pk).0[32] != 0xff)
-            || secp256k1_ec_seckey_verify(cx, (*pk).0[0..32].as_ptr()) == 0
+        if (&*pk).0[1..32] != (&*pk).0[33..64]
+            || ((*pk).0[32] != 0 && (&*pk).0[32] != 0xff)
+            || secp256k1_ec_seckey_verify(cx, (&*pk).0[0..32].as_ptr()) == 0
         {
             0
         } else {
@@ -1481,11 +1380,11 @@ mod fuzz_dummy {
         }
     }
     unsafe fn test_cleanup_pk(pk: *mut PublicKey) {
-        (*pk).0[32..].copy_from_slice(&(*pk).0[..32]);
-        if (*pk).0[32] <= 0x7f {
-            (*pk).0[32] = 0;
+        (&mut *pk).0[32..].copy_from_slice(&(&*pk).0[..32]);
+        if (&*pk).0[32] <= 0x7f {
+            (&mut *pk).0[32] = 0;
         } else {
-            (*pk).0[32] = 0xff;
+            (&mut *pk).0[32] = 0xff;
         }
     }
 
@@ -1498,29 +1397,27 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         match in_len {
-            33 => {
+            33 =>
                 if *input != 2 && *input != 3 {
                     0
                 } else {
-                    ptr::copy(input.offset(1), (*pk).0[0..32].as_mut_ptr(), 32);
-                    ptr::copy(input.offset(2), (*pk).0[33..64].as_mut_ptr(), 31);
+                    ptr::copy(input.offset(1), (&mut *pk).0[0..32].as_mut_ptr(), 32);
+                    ptr::copy(input.offset(2), (&mut *pk).0[33..64].as_mut_ptr(), 31);
                     if *input == 3 {
                         (*pk).0[32] = 0xff;
                     } else {
                         (*pk).0[32] = 0;
                     }
                     test_pk_validate(cx, pk)
-                }
-            }
-            65 => {
+                },
+            65 =>
                 if *input != 4 && *input != 6 && *input != 7 {
                     0
                 } else {
-                    ptr::copy(input.offset(1), (*pk).0.as_mut_ptr(), 64);
+                    ptr::copy(input.offset(1), (&mut *pk).0.as_mut_ptr(), 64);
                     test_cleanup_pk(pk);
                     test_pk_validate(cx, pk)
-                }
-            }
+                },
             _ => 0,
         }
     }
@@ -1564,7 +1461,7 @@ mod fuzz_dummy {
         if secp256k1_ec_seckey_verify(cx, sk) != 1 {
             return 0;
         }
-        ptr::copy(sk, (*pk).0[0..32].as_mut_ptr(), 32);
+        ptr::copy(sk, (&mut *pk).0[0..32].as_mut_ptr(), 32);
         test_cleanup_pk(pk);
         assert_eq!(test_pk_validate(cx, pk), 1);
         1
@@ -1573,7 +1470,7 @@ mod fuzz_dummy {
     pub unsafe fn secp256k1_ec_pubkey_negate(cx: *const Context, pk: *mut PublicKey) -> c_int {
         check_context_flags(cx, 0);
         assert_eq!(test_pk_validate(cx, pk), 1);
-        if secp256k1_ec_seckey_negate(cx, (*pk).0[..32].as_mut_ptr()) != 1 {
+        if secp256k1_ec_seckey_negate(cx, (&mut *pk).0[..32].as_mut_ptr()) != 1 {
             return 0;
         }
         test_cleanup_pk(pk);
@@ -1589,7 +1486,7 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, SECP256K1_START_VERIFY);
         assert_eq!(test_pk_validate(cx, pk), 1);
-        if secp256k1_ec_seckey_tweak_add(cx, (*pk).0[..32].as_mut_ptr(), tweak) != 1 {
+        if secp256k1_ec_seckey_tweak_add(cx, (&mut *pk).0[..32].as_mut_ptr(), tweak) != 1 {
             return 0;
         }
         test_cleanup_pk(pk);
@@ -1605,7 +1502,7 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         assert_eq!(test_pk_validate(cx, pk), 1);
-        if secp256k1_ec_seckey_tweak_mul(cx, (*pk).0[..32].as_mut_ptr(), tweak) != 1 {
+        if secp256k1_ec_seckey_tweak_mul(cx, (&mut *pk).0[..32].as_mut_ptr(), tweak) != 1 {
             return 0;
         }
         test_cleanup_pk(pk);
@@ -1621,13 +1518,13 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         assert!(n >= 1);
-        *out = **ins;
+        (*out) = **ins;
         for i in 1..n {
             assert_eq!(test_pk_validate(cx, *ins.offset(i as isize)), 1);
             if secp256k1_ec_seckey_tweak_add(
                 cx,
-                (*out).0[..32].as_mut_ptr(),
-                (**ins.offset(i as isize)).0[..32].as_ptr(),
+                (&mut *out).0[..32].as_mut_ptr(),
+                (&**ins.offset(i as isize)).0[..32].as_ptr(),
             ) != 1
             {
                 return 0;
@@ -1654,7 +1551,7 @@ mod fuzz_dummy {
         }
 
         let scalar_slice = slice::from_raw_parts(scalar, 32);
-        let pk_slice = &(*point).0[..32];
+        let pk_slice = &(&*point).0[..32];
 
         let mut res_arr = [0u8; 32];
         for i in 0..32 {
@@ -1662,7 +1559,7 @@ mod fuzz_dummy {
         }
 
         if let Some(hashfn) = hashfp {
-            hashfn(out, res_arr.as_ptr(), res_arr.as_ptr(), data);
+            (hashfn)(out, res_arr.as_ptr(), res_arr.as_ptr(), data);
         } else {
             res_arr[16] = 0x00; // result should always be a valid secret key
             let out_slice = slice::from_raw_parts_mut(out, 32);
@@ -1683,7 +1580,7 @@ mod fuzz_dummy {
         // Actually verify
         let sig_sl = slice::from_raw_parts(sig as *const u8, 64);
         let msg_sl = slice::from_raw_parts(msg32 as *const u8, 32);
-        if &sig_sl[..32] == msg_sl && sig_sl[32..] == (*pk).0[0..32] {
+        if &sig_sl[..32] == msg_sl && sig_sl[32..] == (&*pk).0[0..32] {
             1
         } else {
             0
@@ -1729,7 +1626,7 @@ mod fuzz_dummy {
         // Actually verify
         let sig_sl = slice::from_raw_parts(sig64 as *const u8, 64);
         let msg_sl = slice::from_raw_parts(msg32 as *const u8, msglen);
-        if &sig_sl[..32] == msg_sl && sig_sl[32..] == (*pubkey).0[..32] {
+        if &sig_sl[..32] == msg_sl && sig_sl[32..] == (&*pubkey).0[..32] {
             1
         } else {
             0
@@ -1788,8 +1685,8 @@ mod fuzz_dummy {
         }
 
         let seckey_slice = slice::from_raw_parts(seckey, 32);
-        (*keypair).0[..32].copy_from_slice(seckey_slice);
-        (*keypair).0[32..].copy_from_slice(&pk.0);
+        (&mut *keypair).0[..32].copy_from_slice(seckey_slice);
+        (&mut *keypair).0[32..].copy_from_slice(&pk.0);
         1
     }
 
@@ -1800,8 +1697,8 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         let inslice = slice::from_raw_parts(input32, 32);
-        (*pubkey).0[..32].copy_from_slice(inslice);
-        (*pubkey).0[32..].copy_from_slice(inslice);
+        (&mut *pubkey).0[..32].copy_from_slice(inslice);
+        (&mut *pubkey).0[32..].copy_from_slice(inslice);
         test_cleanup_pk(pubkey as *mut PublicKey);
         test_pk_validate(cx, pubkey as *mut PublicKey)
     }
@@ -1813,7 +1710,7 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         let outslice = slice::from_raw_parts_mut(output32, 32);
-        outslice.copy_from_slice(&(*pubkey).0[..32]);
+        outslice.copy_from_slice(&(&*pubkey).0[..32]);
         1
     }
 
@@ -1827,7 +1724,7 @@ mod fuzz_dummy {
         if !pk_parity.is_null() {
             *pk_parity = ((*pubkey).0[32] == 0).into();
         }
-        (*xonly_pubkey).0.copy_from_slice(&(*pubkey).0);
+        (*xonly_pubkey).0.copy_from_slice(&(&*pubkey).0);
         assert_eq!(test_pk_validate(cx, pubkey), 1);
         1
     }
@@ -1851,9 +1748,9 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, 0);
         if !pk_parity.is_null() {
-            *pk_parity = ((*keypair).0[64] == 0).into();
+            *pk_parity = ((&*keypair).0[64] == 0).into();
         }
-        (*pubkey).0.copy_from_slice(&(*keypair).0[32..]);
+        (&mut *pubkey).0.copy_from_slice(&(&*keypair).0[32..]);
         1
     }
 
@@ -1864,16 +1761,13 @@ mod fuzz_dummy {
     ) -> c_int {
         check_context_flags(cx, SECP256K1_START_VERIFY);
         let mut pk = PublicKey::new();
-        pk.0.copy_from_slice(&(*keypair).0[32..]);
+        pk.0.copy_from_slice(&(&*keypair).0[32..]);
         let mut sk = [0u8; 32];
-        sk.copy_from_slice(&(*keypair).0[..32]);
+        sk.copy_from_slice(&(&*keypair).0[..32]);
         assert_eq!(secp256k1_ec_pubkey_tweak_add(cx, &mut pk, tweak32), 1);
-        assert_eq!(
-            secp256k1_ec_seckey_tweak_add(cx, (&mut sk[..]).as_mut_ptr(), tweak32),
-            1
-        );
-        (*keypair).0[..32].copy_from_slice(&sk);
-        (*keypair).0[32..].copy_from_slice(&pk.0);
+        assert_eq!(secp256k1_ec_seckey_tweak_add(cx, (&mut sk[..]).as_mut_ptr(), tweak32), 1);
+        (&mut *keypair).0[..32].copy_from_slice(&sk);
+        (&mut *keypair).0[32..].copy_from_slice(&pk.0);
         1
     }
 
@@ -1909,8 +1803,9 @@ mod tests {
     #[cfg(not(rust_secp_no_symbol_renaming))]
     #[test]
     fn test_strlen() {
-        use super::strlen;
         use std::ffi::CString;
+
+        use super::strlen;
 
         let orig = "test strlen \t \n";
         let test = CString::new(orig).unwrap();
