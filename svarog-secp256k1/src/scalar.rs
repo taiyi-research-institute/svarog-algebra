@@ -9,6 +9,15 @@ use crate::{CURVE_ORDER_WORDS, Secp256k1};
 #[derive(Clone, Debug, Default)]
 pub struct Scalar(pub(crate) [u8; 32]);
 
+impl Scalar {
+    /// Convert to internal C scalar representation (4×u64, native endian).
+    pub(crate) fn to_cscalar(&self) -> ffi::CScalar {
+        let mut cs = ffi::CScalar { d: [0u64; 4] };
+        unsafe { ffi::svarog_scalar_set_b32(&mut cs, self.0.as_ptr(), core::ptr::null_mut()) };
+        cs
+    }
+}
+
 impl abs::TrScalar<Secp256k1> for Scalar {
     #[inline]
     fn new(x: i64) -> Scalar {
@@ -151,39 +160,31 @@ impl abs::TrScalar<Secp256k1> for Scalar {
         x
     }
 
-    /// Compute $$x^{-1} \pmod n$$ in constant time.
-    /// * Less side-channel leak.
-    /// * Less efficient average-cases.
+    /// Compute $$x^{-1} \pmod n$$ (variable-time).
     #[inline]
     fn inv_ct(&self) -> Self {
         if self == Secp256k1::zero() {
             return Secp256k1::zero().clone();
         }
         let mut x = self.clone();
-
         let success = unsafe {
-            ffi::secp256k1_ec_seckey_invert_ct(ffi::secp256k1_context_no_precomp, x.as_mut_c_ptr())
+            ffi::svarog_seckey_inverse(x.as_mut_c_ptr())
         };
         assert_eq!(success, 1);
-
         x
     }
 
-    /// Compute $$x^{-1} \pmod n$$ in variable time.
-    /// * More efficient average-cases.
-    /// * More side-channel leak.
+    /// Compute $$x^{-1} \pmod n$$ (variable-time).
     #[inline]
     fn inv_vt(&self) -> Scalar {
         if self == Secp256k1::zero() {
             return Secp256k1::zero().clone();
         }
         let mut x = self.clone();
-
         let success = unsafe {
-            ffi::secp256k1_ec_seckey_invert_vt(ffi::secp256k1_context_no_precomp, x.as_mut_c_ptr())
+            ffi::svarog_seckey_inverse(x.as_mut_c_ptr())
         };
         assert_eq!(success, 1);
-
         x
     }
 }

@@ -696,36 +696,6 @@ SECP256K1_API SECP256K1_WARN_UNUSED_RESULT int rustsecp256k1_v0_13_ec_seckey_neg
     unsigned char *seckey
 ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2);
 
-/** Inverts a secret key mod curve order, in constant time, in place.
- *
- *  Returns: 0 if the given secret key is invalid according to
- *           rustsecp256k1_v0_13_ec_seckey_verify. 1 otherwise
- *  Args:   ctx:    pointer to a context object
- *  In/Out: seckey: pointer to the 32-byte secret key to be inverted. If the
- *                  secret key is invalid according to
- *                  rustsecp256k1_v0_13_ec_seckey_verify, this function returns 0 and
- *                  seckey will be set to some unspecified value.
- */
-SECP256K1_API SECP256K1_WARN_UNUSED_RESULT int rustsecp256k1_v0_13_ec_seckey_invert_ct(
-    const rustsecp256k1_v0_13_context *ctx,
-    unsigned char *seckey
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2);
-
-/** Inverts a secret key mod curve order, in variable time, in place.
- *
- *  Returns: 0 if the given secret key is invalid according to
- *           rustsecp256k1_v0_13_ec_seckey_verify. 1 otherwise
- *  Args:   ctx:    pointer to a context object
- *  In/Out: seckey: pointer to the 32-byte secret key to be inverted. If the
- *                  secret key is invalid according to
- *                  rustsecp256k1_v0_13_ec_seckey_verify, this function returns 0 and
- *                  seckey will be set to some unspecified value.
- */
-SECP256K1_API SECP256K1_WARN_UNUSED_RESULT int rustsecp256k1_v0_13_ec_seckey_invert_vt(
-    const rustsecp256k1_v0_13_context *ctx,
-    unsigned char *seckey
-) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2);
-
 /** Negates a public key in place.
  *
  *  Returns: 1 always

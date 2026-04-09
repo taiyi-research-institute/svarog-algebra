@@ -70,8 +70,7 @@ impl abs::TrCurve for Secp256k1 {
 
     fn identity() -> &'static Point {
         static IDENTITY: LazyLock<Point> = LazyLock::new(|| {
-            let inner = unsafe { ffi::PublicKey::new() };
-            Point(inner)
+            Point(ffi::Gej::new_infinity())
         });
         &IDENTITY
     }

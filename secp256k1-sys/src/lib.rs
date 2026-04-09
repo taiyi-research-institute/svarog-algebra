@@ -180,7 +180,7 @@ impl PublicKey {
     pub fn underlying_bytes(self) -> [c_uchar; 64] { self.0 }
 
     /// Serializes this public key as a byte-encoded pair of values, in compressed form.
-    pub fn serialize(&self) -> [u8; 33] {
+    fn serialize(&self) -> [u8; 33] {
         let mut buf = [0u8; 33];
         let mut len = 33;
         unsafe {
@@ -658,18 +658,6 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_invert_ct"
-    )]
-    pub fn secp256k1_ec_seckey_invert_ct(cx: *const Context, sk: *mut c_uchar) -> c_int;
-
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_invert_vt"
-    )]
-    pub fn secp256k1_ec_seckey_invert_vt(cx: *const Context, sk: *mut c_uchar) -> c_int;
-
-    #[cfg_attr(
-        not(rust_secp_no_symbol_renaming),
         link_name = "rustsecp256k1_v0_13_ec_seckey_tweak_add"
     )]
     pub fn secp256k1_ec_seckey_tweak_add(
@@ -742,6 +730,193 @@ extern "C" {
         data: *mut c_void,
     ) -> c_int;
 
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubnonce_parse"
+    )]
+    pub fn secp256k1_musig_pubnonce_parse(
+        cx: *const Context,
+        nonce: *mut MusigPubNonce,
+        in66: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubnonce_serialize"
+    )]
+    pub fn secp256k1_musig_pubnonce_serialize(
+        cx: *const Context,
+        out66: *mut c_uchar,
+        nonce: *const MusigPubNonce,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_aggnonce_parse"
+    )]
+    pub fn secp256k1_musig_aggnonce_parse(
+        cx: *const Context,
+        nonce: *mut MusigAggNonce,
+        in66: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_aggnonce_serialize"
+    )]
+    pub fn secp256k1_musig_aggnonce_serialize(
+        cx: *const Context,
+        out66: *mut c_uchar,
+        nonce: *const MusigAggNonce,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_partial_sig_parse"
+    )]
+    pub fn secp256k1_musig_partial_sig_parse(
+        cx: *const Context,
+        sig: *mut MusigPartialSignature,
+        in32: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_partial_sig_serialize"
+    )]
+    pub fn secp256k1_musig_partial_sig_serialize(
+        cx: *const Context,
+        out32: *mut c_uchar,
+        sig: *const MusigPartialSignature,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubkey_agg"
+    )]
+    pub fn secp256k1_musig_pubkey_agg(
+        cx: *const Context,
+        agg_pk: *mut XOnlyPublicKey,
+        keyagg_cache: *mut MusigKeyAggCache,
+        pubkeys: *const *const PublicKey,
+        n_pubkeys: size_t,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubkey_get"
+    )]
+    pub fn secp256k1_musig_pubkey_get(
+        cx: *const Context,
+        agg_pk: *mut PublicKey,
+        keyagg_cache: *const MusigKeyAggCache,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubkey_ec_tweak_add"
+    )]
+    pub fn secp256k1_musig_pubkey_ec_tweak_add(
+        cx: *const Context,
+        output_pubkey: *mut PublicKey,
+        keyagg_cache: *mut MusigKeyAggCache,
+        tweak32: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_pubkey_xonly_tweak_add"
+    )]
+    pub fn secp256k1_musig_pubkey_xonly_tweak_add(
+        cx: *const Context,
+        output_pubkey: *mut PublicKey,
+        keyagg_cache: *mut MusigKeyAggCache,
+        tweak32: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_nonce_gen"
+    )]
+    pub fn secp256k1_musig_nonce_gen(
+        cx: *const Context,
+        secnonce: *mut MusigSecNonce,
+        pubnonce: *mut MusigPubNonce,
+        session_secrand32: *mut c_uchar,
+        seckey: *const c_uchar,
+        pubkey: *const PublicKey,
+        msg32: *const c_uchar,
+        keyagg_cache: *const MusigKeyAggCache,
+        extra_input32: *const c_uchar,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_nonce_agg"
+    )]
+    pub fn secp256k1_musig_nonce_agg(
+        cx: *const Context,
+        aggnonce: *mut MusigAggNonce,
+        pubnonces: *const *const MusigPubNonce,
+        n_pubnonces: size_t,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_nonce_process"
+    )]
+    pub fn secp256k1_musig_nonce_process(
+        cx: *const Context,
+        session: *mut MusigSession,
+        aggnonce: *const MusigAggNonce,
+        msg32: *const c_uchar,
+        keyagg_cache: *const MusigKeyAggCache,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_partial_sign"
+    )]
+    pub fn secp256k1_musig_partial_sign(
+        cx: *const Context,
+        partial_sig: *mut MusigPartialSignature,
+        secnonce: *mut MusigSecNonce,
+        keypair: *const Keypair,
+        keyagg_cache: *const MusigKeyAggCache,
+        session: *const MusigSession,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_partial_sig_verify"
+    )]
+    pub fn secp256k1_musig_partial_sig_verify(
+        cx: *const Context,
+        partial_sig: *const MusigPartialSignature,
+        pubnonce: *const MusigPubNonce,
+        pubkey: *const PublicKey,
+        keyagg_cache: *const MusigKeyAggCache,
+        session: *const MusigSession,
+    ) -> c_int;
+
+    #[cfg_attr(
+        not(rust_secp_no_symbol_renaming),
+        link_name = "rustsecp256k1_v0_13_musig_partial_sig_agg"
+    )]
+    pub fn secp256k1_musig_partial_sig_agg(
+        cx: *const Context,
+        sig64: *mut c_uchar,
+        session: *const MusigSession,
+        partial_sigs: *const *const MusigPartialSignature,
+        n_sigs: size_t,
+    ) -> c_int;
+
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ec_pubkey_sort")]
+    pub fn secp256k1_ec_pubkey_sort(
+        ctx: *const Context,
+        pubkeys: *mut *const PublicKey,
+        n_pubkeys: size_t,
+    ) -> c_int;
 }
 
 #[cfg(not(secp256k1_fuzz))]
@@ -850,7 +1025,6 @@ extern "C" {
         tweak: *const c_uchar,
     ) -> c_int;
 
-    // Custom patch: C implementation modified to allow summing to the point at infinity.
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
         link_name = "rustsecp256k1_v0_13_ec_pubkey_combine"
@@ -1235,6 +1409,78 @@ impl<T: CPtr> CPtr for Option<T> {
         }
     }
 }
+/// Total size (in bytes) of the key aggregation context.
+/// This structure packs all metadata needed for aggregating individual public keys
+/// into a single MuSig2 aggregated key (including coefficients and any extra metadata).
+pub const MUSIG_KEYAGG_SIZE: usize = 197;
+
+/// Size (in bytes) of the secret nonce structure used in a MuSig2 session.
+/// It holds the secret (ephemeral) nonces used internally for nonce derivation
+/// before the corresponding public nonces are computed.
+pub const MUSIG_SECNONCE_SIZE: usize = 132;
+
+/// Size (in bytes) of the public nonce structure.
+/// This is derived from the secret nonce and shared among participants to build
+/// nonce commitments in the MuSig2 protocol.
+pub const MUSIG_PUBNONCE_SIZE: usize = 132;
+
+/// Size (in bytes) of the aggregated nonce structure.
+/// Represents the combined nonce obtained by aggregating the individual public nonces
+/// from all participants for the final signature computation.
+pub const MUSIG_AGGNONCE_SIZE: usize = 132;
+
+/// Size (in bytes) of the session structure.
+/// The session object holds all state needed for a MuSig2 signing session (e.g. aggregated nonce,
+/// key aggregation info, and other state necessary for computing partial signatures).
+pub const MUSIG_SESSION_SIZE: usize = 133;
+
+/// Size (in bytes) of the internal representation of a partial signature.
+/// This structure include magic bytes ([0xeb, 0xfb, 0x1a, 0x32]) alongside the actual signature scalar.
+pub const MUSIG_PART_SIG_SIZE: usize = 36;
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MusigKeyAggCache([c_uchar; MUSIG_KEYAGG_SIZE]);
+impl_array_newtype!(MusigKeyAggCache, c_uchar, MUSIG_KEYAGG_SIZE);
+impl_raw_debug!(MusigKeyAggCache);
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub struct MusigSecNonce([c_uchar; MUSIG_SECNONCE_SIZE]);
+impl_array_newtype!(MusigSecNonce, c_uchar, MUSIG_SECNONCE_SIZE);
+impl_raw_debug!(MusigSecNonce);
+
+impl MusigSecNonce {
+    pub fn dangerous_from_bytes(bytes: [c_uchar; MUSIG_SECNONCE_SIZE]) -> Self {
+        MusigSecNonce(bytes)
+    }
+
+    pub fn dangerous_into_bytes(self) -> [c_uchar; MUSIG_SECNONCE_SIZE] { self.0 }
+}
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MusigPubNonce([c_uchar; MUSIG_PUBNONCE_SIZE]);
+impl_array_newtype!(MusigPubNonce, c_uchar, MUSIG_PUBNONCE_SIZE);
+impl_raw_debug!(MusigPubNonce);
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MusigAggNonce([c_uchar; MUSIG_AGGNONCE_SIZE]);
+impl_array_newtype!(MusigAggNonce, c_uchar, MUSIG_AGGNONCE_SIZE);
+impl_raw_debug!(MusigAggNonce);
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MusigSession([c_uchar; MUSIG_SESSION_SIZE]);
+impl_array_newtype!(MusigSession, c_uchar, MUSIG_SESSION_SIZE);
+impl_raw_debug!(MusigSession);
+
+#[repr(C)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct MusigPartialSignature([c_uchar; MUSIG_PART_SIG_SIZE]);
+impl_array_newtype!(MusigPartialSignature, c_uchar, MUSIG_PART_SIG_SIZE);
+impl_raw_debug!(MusigPartialSignature);
 
 #[cfg(secp256k1_fuzz)]
 mod fuzz_dummy {
@@ -1797,6 +2043,121 @@ mod fuzz_dummy {
 
 #[cfg(secp256k1_fuzz)]
 pub use self::fuzz_dummy::*;
+
+// ===========================================================================
+// svarog algebra: direct access to internal ge/gej/scalar/fe operations
+// ===========================================================================
+
+/// Internal field element (5×u64 limbs, base 2^52). 40 bytes.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Fe {
+    pub n: [u64; 5],
+}
+
+/// Compact field element storage (4×u64). 32 bytes.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct FeStorage {
+    pub n: [u64; 4],
+}
+
+/// Affine group element on secp256k1. 88 bytes.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Ge {
+    pub x: Fe,
+    pub y: Fe,
+    pub infinity: c_int,
+}
+
+/// Jacobian group element on secp256k1. 128 bytes.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Gej {
+    pub x: Fe,
+    pub y: Fe,
+    pub z: Fe,
+    pub infinity: c_int,
+}
+
+/// Compact affine point storage (2×FeStorage). 64 bytes.
+/// Same internal layout as PublicKey on 64-bit systems.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct GeStorage {
+    pub x: FeStorage,
+    pub y: FeStorage,
+}
+
+/// Internal scalar (4×u64, native endian). 32 bytes.
+/// Different layout from the 32-byte big-endian representation used by Scalar([u8;32]).
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct CScalar {
+    pub d: [u64; 4],
+}
+
+impl Gej {
+    pub fn new_infinity() -> Self {
+        let mut r = core::mem::MaybeUninit::<Gej>::uninit();
+        unsafe {
+            svarog_gej_set_infinity(r.as_mut_ptr());
+            r.assume_init()
+        }
+    }
+}
+
+extern "C" {
+    // --- Group element operations ---
+    pub fn svarog_gej_set_infinity(r: *mut Gej);
+    pub fn svarog_gej_is_infinity(a: *const Gej) -> c_int;
+    pub fn svarog_ge_is_infinity(a: *const Ge) -> c_int;
+    pub fn svarog_ge_set_gej_var(r: *mut Ge, a: *mut Gej);
+    pub fn svarog_gej_set_ge(r: *mut Gej, a: *const Ge);
+    pub fn svarog_ge_set_xy(r: *mut Ge, x: *const Fe, y: *const Fe);
+    pub fn svarog_gej_neg(r: *mut Gej, a: *const Gej);
+    pub fn svarog_gej_add_var(r: *mut Gej, a: *const Gej, b: *const Gej, rzr: *mut Fe);
+    pub fn svarog_gej_add_ge_var(r: *mut Gej, a: *const Gej, b: *const Ge, rzr: *mut Fe);
+    pub fn svarog_gej_double_var(r: *mut Gej, a: *const Gej, rzr: *mut Fe);
+    pub fn svarog_ge_to_storage(r: *mut GeStorage, a: *const Ge);
+    pub fn svarog_ge_from_storage(r: *mut Ge, a: *const GeStorage);
+
+    // --- High-level gej convenience ---
+    pub fn svarog_gej_eq_var(a: *const Gej, b: *const Gej) -> c_int;
+    pub fn svarog_ecmult_const_gej(r: *mut Gej, a: *const Gej, q: *const CScalar);
+    pub fn svarog_gej_to_storage(r: *mut GeStorage, a: *const Gej) -> c_int;
+    pub fn svarog_gej_from_storage(r: *mut Gej, a: *const GeStorage);
+    pub fn svarog_gej_serialize(
+        out: *mut c_uchar, outlen: *mut c_int,
+        a: *const Gej, compressed: c_int,
+    ) -> c_int;
+    pub fn svarog_gej_parse(
+        r: *mut Gej, input: *const c_uchar, inputlen: c_int,
+    ) -> c_int;
+
+    // --- Scalar multiplication (low-level) ---
+    pub fn svarog_ecmult_const(r: *mut Gej, a: *const Ge, q: *const CScalar);
+    pub fn svarog_ecmult_gen(ctx: *const Context, r: *mut Gej, a: *const CScalar);
+
+    // --- Field element operations ---
+    pub fn svarog_fe_set_b32_limit(r: *mut Fe, a: *const c_uchar) -> c_int;
+    pub fn svarog_fe_get_b32(r: *mut c_uchar, a: *const Fe);
+    pub fn svarog_fe_normalize_var(r: *mut Fe);
+
+    // --- Scalar operations ---
+    pub fn svarog_scalar_set_b32(r: *mut CScalar, bin: *const c_uchar, overflow: *mut c_int);
+    pub fn svarog_scalar_get_b32(bin: *mut c_uchar, a: *const CScalar);
+    pub fn svarog_scalar_negate(r: *mut CScalar, a: *const CScalar);
+    pub fn svarog_scalar_add(r: *mut CScalar, a: *const CScalar, b: *const CScalar) -> c_int;
+    pub fn svarog_scalar_mul(r: *mut CScalar, a: *const CScalar, b: *const CScalar);
+    pub fn svarog_scalar_inverse_var(r: *mut CScalar, a: *const CScalar);
+    pub fn svarog_scalar_is_zero(a: *const CScalar) -> c_int;
+    pub fn svarog_scalar_eq(a: *const CScalar, b: *const CScalar) -> c_int;
+
+    // --- High-level seckey inverse (operates on [u8;32] like other ec_seckey_* fns) ---
+    pub fn svarog_seckey_inverse(seckey: *mut c_uchar) -> c_int;
+}
 
 #[cfg(test)]
 mod tests {

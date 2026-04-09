@@ -1,19 +1,28 @@
 use std::fmt;
 
 use curve_abstract::{self as abs, TrCurve, TrScalar};
-use secp256k1_sys::{self as ffi, CPtr, types::c_uint};
+use secp256k1_sys::{self as ffi, types::c_int};
 use serde::{Deserialize, Serialize};
 
 use crate::{Scalar, Secp256k1, thlocal_ctx};
 
-#[derive(Clone, PartialEq, Eq)]
-pub struct Point(pub(crate) ffi::PublicKey);
+/// An elliptic curve point on secp256k1, stored internally as a jacobian group element.
+#[derive(Clone, Copy)]
+pub struct Point(pub(crate) ffi::Gej);
 
 impl Default for Point {
     fn default() -> Self {
         Secp256k1::identity().clone()
     }
 }
+
+impl PartialEq for Point {
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { ffi::svarog_gej_eq_var(&self.0, &other.0) == 1 }
+    }
+}
+
+impl Eq for Point {}
 
 impl abs::TrPoint<Secp256k1> for Point {
     #[inline]
@@ -23,45 +32,30 @@ impl abs::TrPoint<Secp256k1> for Point {
 
     #[inline]
     fn to_bytes(&self) -> Vec<u8> {
-        self.to_bytes33().to_vec()
+        self.to_bytes33()
     }
 
     #[inline]
     fn to_bytes_long(&self) -> Vec<u8> {
-        self.to_bytes65().to_vec()
+        self.to_bytes65()
     }
 
     #[inline]
     fn add(&self, other: &Self) -> Self {
-        Self::sum(&[self, other])
+        let mut r = ffi::Gej::new_infinity();
+        unsafe { ffi::svarog_gej_add_var(&mut r, &self.0, &other.0, core::ptr::null_mut()) };
+        Point(r)
     }
 
     #[inline]
     fn sum(points: &[&Self]) -> Self {
-        let mut res = Secp256k1::identity().clone();
-        assert!(points.len() <= (i32::MAX as usize));
-        let ptrs = {
-            let mut res = Vec::new();
-            for p in points {
-                if *p != Secp256k1::identity() {
-                    res.push(*p);
-                }
-            }
-            res
-        };
-        if ptrs.len() == 0 {
-            return res;
+        let mut r = ffi::Gej::new_infinity();
+        for p in points {
+            let mut tmp = ffi::Gej::new_infinity();
+            unsafe { ffi::svarog_gej_add_var(&mut tmp, &r, &p.0, core::ptr::null_mut()) };
+            r = tmp;
         }
-        let ptrs = unsafe {
-            use std::mem::transmute;
-            transmute::<&[&Point], &[*const ffi::PublicKey]>(ptrs.as_ref())
-        };
-        let success = unsafe {
-            ffi::secp256k1_ec_pubkey_combine(thlocal_ctx(), &mut res.0, ptrs.as_c_ptr(), ptrs.len())
-        };
-        assert_eq!(success, 1);
-
-        res
+        Point(r)
     }
 
     #[inline]
@@ -71,65 +65,43 @@ impl abs::TrPoint<Secp256k1> for Point {
 
     #[inline]
     fn neg(&self) -> Self {
-        let mut p = self.clone();
-        unsafe {
-            let success = ffi::secp256k1_ec_pubkey_negate(thlocal_ctx(), &mut p.0);
-            assert_eq!(success, 1);
-        }
-        p
+        let mut r = ffi::Gej::new_infinity();
+        unsafe { ffi::svarog_gej_neg(&mut r, &self.0) };
+        Point(r)
     }
 
     #[inline]
     fn add_gx(&self, x: &Scalar) -> Self {
-        let mut p = self.clone();
-        let success =
-            unsafe { ffi::secp256k1_ec_pubkey_tweak_add(thlocal_ctx(), &mut p.0, x.as_c_ptr()) };
-        if success == 1 {
-            return p;
-        } else if x == Secp256k1::zero() {
-            return self.clone();
-        } else if self == Secp256k1::identity() {
-            return Self::new_gx(x);
-        } else {
-            panic!()
-        }
+        let gx = Self::new_gx(x);
+        self.add(&gx)
     }
 
     #[inline]
     fn sub_gx(&self, x: &Scalar) -> Self {
-        let other = Self::new_gx(&x.neg());
-        self.add(&other)
+        let gx = Self::new_gx(&x.neg());
+        self.add(&gx)
     }
 
     #[inline]
     fn new_gx(x: &Scalar) -> Self {
-        let mut pk = unsafe { ffi::PublicKey::new() };
-        let success =
-            unsafe { ffi::secp256k1_ec_pubkey_create(thlocal_ctx(), &mut pk, x.as_c_ptr()) };
-        if success == 1 {
-            return Self(pk);
-        } else if x == Secp256k1::zero() {
+        if x == Secp256k1::zero() {
             return Secp256k1::identity().clone();
-        } else {
-            panic!();
         }
+        let cs = x.to_cscalar();
+        let mut r = ffi::Gej::new_infinity();
+        unsafe { ffi::svarog_ecmult_gen(thlocal_ctx(), &mut r, &cs) };
+        Point(r)
     }
 
     #[inline]
     fn mul_x(&self, other: &Scalar) -> Point {
-        let mut p = self.clone();
-        let success = unsafe {
-            ffi::secp256k1_ec_pubkey_tweak_mul(thlocal_ctx(), &mut p.0, other.as_c_ptr())
-        };
-        if success == 1 {
-            return p;
-        } else if other == Secp256k1::zero() {
+        if other == Secp256k1::zero() {
             return Secp256k1::identity().clone();
-        } else if self == Secp256k1::identity() {
-            return Secp256k1::identity().clone();
-        } else {
-            panic!()
         }
+        let cs = other.to_cscalar();
+        let mut r = ffi::Gej::new_infinity();
+        unsafe { ffi::svarog_ecmult_const_gej(&mut r, &self.0, &cs) };
+        Point(r)
     }
 }
 
@@ -138,7 +110,7 @@ impl Serialize for Point {
     where
         S: serde::Serializer,
     {
-        self.to_bytes33().to_vec().serialize(serializer)
+        self.to_bytes33().serialize(serializer)
     }
 }
 
@@ -147,9 +119,9 @@ impl<'de> Deserialize<'de> for Point {
     where
         D: serde::Deserializer<'de>,
     {
-        let bytes33: Vec<u8> = Vec::<u8>::deserialize(deserializer)?;
+        let bytes: Vec<u8> = Vec::<u8>::deserialize(deserializer)?;
         let point =
-            Self::new_from_bytes(&bytes33).map_err(|e| serde::de::Error::custom(e.to_string()))?;
+            Self::new_from_bytes(&bytes).map_err(|e| serde::de::Error::custom(e.to_string()))?;
         Ok(point)
     }
 }
@@ -175,54 +147,52 @@ impl Point {
         if data.len() != 33 && data.len() != 65 {
             return Err("Invalid length of point bytes");
         }
-        let mut pk = unsafe { ffi::PublicKey::new() };
-        let success = unsafe {
-            ffi::secp256k1_ec_pubkey_parse(thlocal_ctx(), &mut pk, data.as_c_ptr(), data.len())
+        // Check for identity encoding
+        if data.len() == 33 && data == &Self::ID_BYTES33 {
+            return Ok(Secp256k1::identity().clone());
+        }
+        if data.len() == 65 && data == &Self::ID_BYTES65 {
+            return Ok(Secp256k1::identity().clone());
+        }
+        let mut r = ffi::Gej::new_infinity();
+        let ok = unsafe {
+            ffi::svarog_gej_parse(&mut r, data.as_ptr(), data.len() as c_int)
         };
-        if success != 1 {
-            if data.len() == 33 && data == &Self::ID_BYTES33 {
-                return Ok(Secp256k1::identity().clone());
-            }
-            if data.len() == 65 && data == &Self::ID_BYTES65 {
-                return Ok(Secp256k1::identity().clone());
-            }
+        if ok != 1 {
             return Err("Invalid point bytes (not on curve).");
         }
-        Ok(Point(pk))
+        Ok(Point(r))
     }
 
     fn to_bytes33(&self) -> Vec<u8> {
+        if self.is_infinity() {
+            return Self::ID_BYTES33.to_vec();
+        }
         let mut buf = vec![0u8; 33];
-        self.to_bytes_internal(&mut buf, ffi::SECP256K1_SER_COMPRESSED);
+        let mut outlen: c_int = 33;
+        let ok = unsafe {
+            ffi::svarog_gej_serialize(buf.as_mut_ptr(), &mut outlen, &self.0, 1)
+        };
+        assert_eq!(ok, 1);
         buf
     }
 
     fn to_bytes65(&self) -> Vec<u8> {
+        if self.is_infinity() {
+            return Self::ID_BYTES65.to_vec();
+        }
         let mut buf = vec![0u8; 65];
-        self.to_bytes_internal(&mut buf, ffi::SECP256K1_SER_UNCOMPRESSED);
+        let mut outlen: c_int = 65;
+        let ok = unsafe {
+            ffi::svarog_gej_serialize(buf.as_mut_ptr(), &mut outlen, &self.0, 0)
+        };
+        assert_eq!(ok, 1);
         buf
     }
 
-    fn to_bytes_internal(&self, ret: &mut [u8], compression: c_uint) {
-        let mut n = ret.len();
-        let success = unsafe {
-            ffi::secp256k1_ec_pubkey_serialize(
-                ffi::secp256k1_context_no_precomp,
-                ret.as_mut_c_ptr(),
-                &mut n,
-                &self.0,
-                compression,
-            )
-        };
-        if success != 1 {
-            if compression == ffi::SECP256K1_SER_COMPRESSED {
-                ret.copy_from_slice(&Self::ID_BYTES33);
-            } else if compression == ffi::SECP256K1_SER_UNCOMPRESSED {
-                ret.copy_from_slice(&Self::ID_BYTES65);
-            } else {
-                panic!()
-            }
-        }
+    #[inline]
+    fn is_infinity(&self) -> bool {
+        unsafe { ffi::svarog_gej_is_infinity(&self.0) == 1 }
     }
 }
 

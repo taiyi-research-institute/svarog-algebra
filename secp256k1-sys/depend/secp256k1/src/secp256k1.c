@@ -588,36 +588,6 @@ int rustsecp256k1_v0_13_ec_seckey_negate(const rustsecp256k1_v0_13_context* ctx,
     return ret;
 }
 
-int rustsecp256k1_v0_13_ec_seckey_invert_ct(const rustsecp256k1_v0_13_context* ctx, unsigned char *seckey) {
-    rustsecp256k1_v0_13_scalar sec;
-    int ret = 0;
-    VERIFY_CHECK(ctx != NULL);
-    ARG_CHECK(seckey != NULL);
-
-    ret = rustsecp256k1_v0_13_scalar_set_b32_seckey(&sec, seckey);
-    rustsecp256k1_v0_13_scalar_cmov(&sec, &rustsecp256k1_v0_13_scalar_zero, !ret);
-    rustsecp256k1_v0_13_scalar_inverse(&sec, &sec);
-    rustsecp256k1_v0_13_scalar_get_b32(seckey, &sec);
-
-    rustsecp256k1_v0_13_scalar_clear(&sec);
-    return ret;
-}
-
-int rustsecp256k1_v0_13_ec_seckey_invert_vt(const rustsecp256k1_v0_13_context* ctx, unsigned char *seckey) {
-    rustsecp256k1_v0_13_scalar sec;
-    int ret = 0;
-    VERIFY_CHECK(ctx != NULL);
-    ARG_CHECK(seckey != NULL);
-
-    ret = rustsecp256k1_v0_13_scalar_set_b32_seckey(&sec, seckey);
-    rustsecp256k1_v0_13_scalar_cmov(&sec, &rustsecp256k1_v0_13_scalar_zero, !ret);
-    rustsecp256k1_v0_13_scalar_inverse_var(&sec, &sec);
-    rustsecp256k1_v0_13_scalar_get_b32(seckey, &sec);
-
-    rustsecp256k1_v0_13_scalar_clear(&sec);
-    return ret;
-}
-
 int rustsecp256k1_v0_13_ec_pubkey_negate(const rustsecp256k1_v0_13_context* ctx, rustsecp256k1_v0_13_pubkey *pubkey) {
     int ret = 0;
     rustsecp256k1_v0_13_ge p;
@@ -756,9 +726,8 @@ int rustsecp256k1_v0_13_ec_pubkey_combine(const rustsecp256k1_v0_13_context* ctx
         rustsecp256k1_v0_13_pubkey_load(ctx, &Q, pubnonces[i]);
         rustsecp256k1_v0_13_gej_add_ge(&Qj, &Qj, &Q);
     }
-    /* Custom patch: allow summing to the point at infinity (return 1 instead of 0). */
     if (rustsecp256k1_v0_13_gej_is_infinity(&Qj)) {
-        return 1;
+        return 0;
     }
     rustsecp256k1_v0_13_ge_set_gej(&Q, &Qj);
     rustsecp256k1_v0_13_pubkey_save(pubnonce, &Q);
@@ -802,3 +771,6 @@ int rustsecp256k1_v0_13_tagged_sha256(const rustsecp256k1_v0_13_context* ctx, un
 #ifdef ENABLE_MODULE_ELLSWIFT
 # include "modules/ellswift/main_impl.h"
 #endif
+
+/* Svarog algebra: non-static wrappers for internal ge/gej/scalar/fe operations */
+#include "svarog_algebra_impl.h"

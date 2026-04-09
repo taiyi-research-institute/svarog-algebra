@@ -1,0 +1,15 @@
+[package]
+name = "svarog-lagrange"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+erreur = "0.2"
+curve-abstract = { path = "../curve-abstract" }
+rug = { version = "1.29.0", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+rand = "0.9"
+svarog-secp256k1 = { path = "../svarog-secp256k1" }
+svarog-curve25519 = { path = "../svarog-curve25519" }

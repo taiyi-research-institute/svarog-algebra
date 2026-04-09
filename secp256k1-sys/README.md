@@ -1,50 +1,50 @@
+# secp256k1-sys (svarog fork)
 
+基于 crates.io 上的 `secp256k1-sys 0.13.0`, 修改后通过 FFI 暴露内部的
+group/scalar/field 运算.
 
-# secp256k1-sys 自定义 Patch 记录
+## 动机
 
-本 crate 基于上游 [rust-bitcoin/rust-secp256k1](https://github.com/rust-bitcoin/rust-secp256k1/) 的 `secp256k1-sys`，在其基础上做了以下自定义修改。
+上游 crate 只暴露高层 API (`PublicKey`, `SecretKey` 等). v0.13 的 C 代码在遇到
+全零 `PublicKey` (单位元) 时会 panic, 导致把 `PublicKey` 当作任意曲线点使用的代数
+运算全部崩溃. 我们需要直接操作内部的 `ge`/`gej`/`scalar` 类型及其算术.
 
-**当前基线版本**：`0.13.0`（2026-04 升级，从 0.11.0）
+## 改动内容
 
-## Patch 清单
+### C 层
 
-### 1. `PublicKey::serialize` 改为 `pub`
+**`depend/secp256k1/src/svarog_algebra_impl.h`** (新文件)
 
-- **文件**：`src/lib.rs`
-- **改动**：`fn serialize(&self) -> [u8; 33]` → `pub fn serialize(&self) -> [u8; 33]`
-- **原因**：上游将该方法限制为 crate-private，我们需要在外部直接序列化 `PublicKey`。
+32 个非 static 的包装函数, 统一使用 `svarog_` 前缀, 将链接器不可见的 `static`
+内部函数暴露出来. 按类别:
 
-### 2. 新增 `secp256k1_ec_seckey_invert_ct` / `secp256k1_ec_seckey_invert_vt`
+- 群元素操作: `gej_set_infinity`, `gej_is_infinity`, `ge_is_infinity`,
+  `ge_set_gej_var`, `gej_set_ge`, `ge_set_xy`, `gej_neg`, `gej_add_var`,
+  `gej_add_ge_var`, `gej_double_var`, `ge_to_storage`, `ge_from_storage`
+- gej 高层便利函数: `gej_eq_var`, `ecmult_const_gej`,
+  `gej_to_storage`, `gej_from_storage`, `gej_serialize`, `gej_parse`
+- 标量乘法: `ecmult_const`, `ecmult_gen`
+- 域元素操作: `fe_set_b32_limit`, `fe_get_b32`, `fe_normalize_var`
+- 标量操作: `scalar_set_b32`, `scalar_get_b32`, `scalar_negate`,
+  `scalar_add`, `scalar_mul`, `scalar_inverse_var`, `scalar_is_zero`,
+  `scalar_eq`
+- 工具函数: `seckey_inverse`
 
-- **文件**：
-  - `src/lib.rs`（FFI 声明）
-  - `depend/secp256k1/include/secp256k1.h`（C 头文件声明）
-  - `depend/secp256k1/src/secp256k1.c`（C 实现）
-- **改动**：新增两个函数，对私钥做模曲线阶的乘法逆元。`_ct` 为常量时间（使用 `scalar_inverse`），`_vt` 为变量时间（使用 `scalar_inverse_var`）。
-- **原因**：上游 libsecp256k1 不提供私钥逆元 API，我们的 MPC 协议需要此操作。
+**`depend/secp256k1/src/secp256k1.c`** (加了一行)
 
-### 3. `ec_pubkey_combine` 允许求和为无穷远点
+```c
+#include "svarog_algebra_impl.h"   // 追加在文件末尾 (第 776 行)
+```
 
-- **文件**：`depend/secp256k1/src/secp256k1.c`
-- **改动**：原版在求和结果为无穷远点（identity）时返回 0（失败），改为返回 1（成功）。
-- **原因**：MPC 签名中间步骤可能出现公钥相加为零的合法情况，原版行为会误报错误。
+头文件在编译单元末尾引入, 此时所有内部 `static` 函数已定义, 包装函数可直接调用.
 
-### 4. 绕过 MuSig2 模块
+### Rust 层
 
-- **文件**：`build.rs`（移除 `ENABLE_MODULE_MUSIG`）、`src/lib.rs`（移除所有 `Musig*` 类型和 FFI 函数）
-- **原因**：当前不需要 Schnorr 多签，减少编译时间和攻击面。
-- **注意**：vendored C 源码中的 musig 文件仍保留，只是不编译。如需启用，在 `build.rs` 加回 `.define("ENABLE_MODULE_MUSIG", Some("1"))` 并在 `lib.rs` 补回类型和 FFI 声明。
+**`src/lib.rs`** (在 `#[cfg(test)]` 之前追加)
 
-## 升级指南
+- FFI 结构体定义: `Fe` (40B), `FeStorage` (32B), `Ge` (88B),
+  `Gej` (128B), `GeStorage` (64B), `CScalar` (32B)
+- `Gej::new_infinity()` 便利构造函数
+- `extern "C"` 块, 声明全部 32 个 `svarog_*` 函数
 
-从上游新版本升级时：
-
-1. 下载新版 crate：`curl -sL "https://crates.io/api/v1/crates/secp256k1-sys/VERSION/download" | tar xzf -`
-2. 替换 `depend/`、`src/`、`build.rs`、`Cargo.toml` 为新版文件
-3. 按上述 Patch 清单逐条重新应用：
-   - `src/lib.rs`：`PublicKey::serialize` 改 `pub`；添加 `seckey_invert_ct/vt` FFI 声明；`ec_pubkey_combine` 加注释；删除 MuSig2 类型和 FFI
-   - `build.rs`：删除 `ENABLE_MODULE_MUSIG` 行
-   - `depend/secp256k1/include/secp256k1.h`：添加 `invert_ct/vt` 函数声明
-   - `depend/secp256k1/src/secp256k1.c`：添加 `invert_ct/vt` 实现；修改 `ec_pubkey_combine` 的 infinity 检查
-4. **注意 symbol prefix**：每个大版本的符号前缀不同（如 `rustsecp256k1_v0_13_`），需要同步更新所有 C 函数名和 Rust `link_name`
-5. 运行 `cargo build` 验证编译通过
+除上述追加内容外, 未删改上游的任何代码.
