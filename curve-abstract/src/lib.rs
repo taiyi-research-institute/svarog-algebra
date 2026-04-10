@@ -55,3 +55,34 @@ pub trait TrPoint<C: TrCurve>:
     fn new_gx(x: &C::ScalarT) -> Self;
     fn mul_x(&self, x: &C::ScalarT) -> Self;
 }
+
+#[allow(async_fn_in_trait)]
+pub trait TrMessenger: Send {
+    type Err: std::error::Error + Send + Sync + 'static;
+
+    fn register_send<T>(
+        &mut self,
+        val: &T,
+        sid: &str,
+        topic: &str,
+        src: usize,
+        dst: usize,
+        seq: usize,
+    ) -> &mut Self
+    where
+        T: Serialize + for<'de> Deserialize<'de> + Clone + Send + Sync + 'static;
+
+    fn register_recv<T>(
+        &mut self,
+        out: &mut T,
+        sid: &str,
+        topic: &str,
+        src: usize,
+        dst: usize,
+        seq: usize,
+    ) -> &mut Self
+    where
+        T: Serialize + for<'de> Deserialize<'de> + Clone + Send + Sync + 'static;
+
+    async fn exchange(&mut self) -> Result<(), Self::Err>;
+}
