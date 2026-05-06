@@ -3,7 +3,6 @@ use std::collections::{HashMap, HashSet};
 
 use curve_abstract::{TrCurve, TrPoint, TrScalar};
 use erreur::*;
-use rug::Integer;
 
 use super::ShamirScheme;
 
@@ -12,7 +11,7 @@ impl<C: TrCurve + 'static> VerifiableSecretSharing<C> for C {
         ui: &C::ScalarT,
         omega_k: &HashSet<usize>,
         th: usize,
-    ) -> (Vec<C::PointT>, HashMap<usize, C::ScalarT>) {
+    ) -> (Vec<C::ScalarT>, Vec<C::PointT>, HashMap<usize, C::ScalarT>) {
         assert!(th >= 1 && th <= omega_k.len());
 
         // generate $$f_i(X)$$, a secret, ephemeral polynomial.
@@ -36,7 +35,7 @@ impl<C: TrCurve + 'static> VerifiableSecretSharing<C> for C {
             fij_map.insert(*j, v);
         }
 
-        (FiX, fij_map)
+        (fiX, FiX, fij_map)
     }
 
     fn eval_poly(x: &C::ScalarT, poly: &[C::ScalarT]) -> C::ScalarT {
@@ -121,6 +120,7 @@ pub trait VerifiableSecretSharing<C: TrCurve> {
     ///
     /// Returns.
     ///
+    /// * `Vec<C::ScalarT>` - The polynomial coefficients $$a_0, a_1, \dots, a_{t-1}$$.
     /// * `Vec<C::PointT>` - This is essentially $$F_j(X)=A_0X^0 + A_1X^1 + \dots + A_{t-1}X^{t-1}$$.
     /// * `HashMap<usize, C::ScalarT>` - The sequence $$f_i(j)$$ organized as a `HashMap`, whose key is $$j$$.
     ///
@@ -138,7 +138,7 @@ pub trait VerifiableSecretSharing<C: TrCurve> {
         ui: &C::ScalarT,
         omega_k: &HashSet<usize>,
         th: usize,
-    ) -> (Vec<C::PointT>, HashMap<usize, C::ScalarT>);
+    ) -> (Vec<C::ScalarT>, Vec<C::PointT>, HashMap<usize, C::ScalarT>);
 
     /// Evaluate a polynomial at x, modulo curve order.
     ///
