@@ -1,3 +1,4 @@
+use rand::{rand_core::UnwrapErr, rngs::OsRng};
 use secp256k1_sys::{self as ffi, CPtr};
 use std::{cell::RefCell, ptr::NonNull};
 
@@ -15,8 +16,10 @@ impl Context {
         let ctx = unsafe { ffi::secp256k1_context_create(FLAGS) };
         let mut ctx = Context(ctx);
 
+        // `OsRng` rather than `rand::rng()`: the latter is a per-thread
+        // ChaCha12 cache that is not reseeded on `fork(2)`.
         #[cfg(not(target_arch = "wasm32"))]
-        ctx.randomize(&mut rand::rng());
+        ctx.randomize(&mut UnwrapErr(OsRng));
 
         ctx
     }

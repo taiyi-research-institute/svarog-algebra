@@ -1,6 +1,6 @@
 use curve_abstract::{TrCurve, TrScalar};
 use curve25519_dalek::Scalar as EdwardScalar;
-use rand::RngCore;
+use rand::{TryRngCore, rngs::OsRng};
 use rug::Integer;
 use serde::{Deserialize, Serialize};
 
@@ -20,11 +20,16 @@ impl TrScalar<Curve25519> for Scalar {
         Self(es)
     }
 
+    /// Draw from the OS RNG directly rather than from `rand::rng()`.
+    /// `ThreadRng` caches a ChaCha12 state per thread and is NOT reseeded on
+    /// `fork(2)`, so a forked child would replay the parent's scalars --
+    /// fatal for signature nonces. `OsRng` is fork-safe.
     #[inline]
     fn new_rand() -> Self {
-        let mut rng = rand::rng();
         let mut buf = [0u8; 64];
-        rng.fill_bytes(&mut buf);
+        OsRng
+            .try_fill_bytes(&mut buf)
+            .expect("OS random number generator failure");
         Self::new_from_bytes(&buf)
     }
 

@@ -1,5 +1,5 @@
 use curve_abstract::{self as abs, TrCurve};
-use rand::RngCore;
+use rand::{TryRngCore, rngs::OsRng};
 use rug::Integer;
 use secp256k1_sys::{self as ffi, CPtr};
 use serde::{Deserialize, Serialize};
@@ -37,10 +37,15 @@ impl abs::TrScalar<Secp256k1> for Scalar {
         res
     }
 
+    /// Draw from the OS RNG directly rather than from `rand::rng()`.
+    /// `ThreadRng` caches a ChaCha12 state per thread and is NOT reseeded on
+    /// `fork(2)`, so a forked child would replay the parent's scalars --
+    /// fatal for ECDSA nonces. `OsRng` is fork-safe.
     fn new_rand() -> Self {
-        let mut rng = rand::rng();
         let mut num = [0u8; 32];
-        rng.fill_bytes(&mut num);
+        OsRng
+            .try_fill_bytes(&mut num)
+            .expect("OS random number generator failure");
         Self::new_from_bytes(&num)
     }
 
