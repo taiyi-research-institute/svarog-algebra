@@ -12,7 +12,7 @@ pub struct Point(pub(crate) ffi::Gej);
 
 impl Default for Point {
     fn default() -> Self {
-        Secp256k1::identity().clone()
+        *Secp256k1::identity()
     }
 }
 
@@ -32,12 +32,12 @@ impl abs::TrPoint<Secp256k1> for Point {
 
     #[inline]
     fn to_bytes(&self) -> Vec<u8> {
-        self.to_bytes33()
+        self.serialize_compressed()
     }
 
     #[inline]
     fn to_bytes_long(&self) -> Vec<u8> {
-        self.to_bytes65()
+        self.serialize_uncompressed()
     }
 
     #[inline]
@@ -85,7 +85,7 @@ impl abs::TrPoint<Secp256k1> for Point {
     #[inline]
     fn new_gx(x: &Scalar) -> Self {
         if x == Secp256k1::zero() {
-            return Secp256k1::identity().clone();
+            return *Secp256k1::identity();
         }
         let cs = x.to_cscalar();
         let mut r = ffi::Gej::new_infinity();
@@ -96,7 +96,7 @@ impl abs::TrPoint<Secp256k1> for Point {
     #[inline]
     fn mul_x(&self, other: &Scalar) -> Point {
         if other == Secp256k1::zero() {
-            return Secp256k1::identity().clone();
+            return *Secp256k1::identity();
         }
         let cs = other.to_cscalar();
         let mut r = ffi::Gej::new_infinity();
@@ -110,7 +110,7 @@ impl Serialize for Point {
     where
         S: serde::Serializer,
     {
-        self.to_bytes33().serialize(serializer)
+        self.serialize_compressed().serialize(serializer)
     }
 }
 
@@ -148,11 +148,11 @@ impl Point {
             return Err("Invalid length of point bytes");
         }
         // Check for identity encoding
-        if data.len() == 33 && data == &Self::ID_BYTES33 {
-            return Ok(Secp256k1::identity().clone());
+        if data.len() == 33 && data == Self::ID_BYTES33 {
+            return Ok(*Secp256k1::identity());
         }
-        if data.len() == 65 && data == &Self::ID_BYTES65 {
-            return Ok(Secp256k1::identity().clone());
+        if data.len() == 65 && data == Self::ID_BYTES65 {
+            return Ok(*Secp256k1::identity());
         }
         let mut r = ffi::Gej::new_infinity();
         let ok = unsafe {
@@ -164,7 +164,7 @@ impl Point {
         Ok(Point(r))
     }
 
-    fn to_bytes33(&self) -> Vec<u8> {
+    fn serialize_compressed(&self) -> Vec<u8> {
         if self.is_infinity() {
             return Self::ID_BYTES33.to_vec();
         }
@@ -177,7 +177,7 @@ impl Point {
         buf
     }
 
-    fn to_bytes65(&self) -> Vec<u8> {
+    fn serialize_uncompressed(&self) -> Vec<u8> {
         if self.is_infinity() {
             return Self::ID_BYTES65.to_vec();
         }
@@ -198,7 +198,7 @@ impl Point {
 
 impl fmt::LowerHex for Point {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let ser = self.to_bytes65();
+        let ser = self.serialize_uncompressed();
         for ch in &ser[1..33] {
             write!(f, "{:02x}", *ch)?;
         }

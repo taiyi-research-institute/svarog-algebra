@@ -20,9 +20,6 @@ fn test_sign_verify() {
     let R = Point::new_gx(&r);
     let s = r.add(&m.mul(&x));
 
-    drop(x);
-    drop(r);
-
     // Bob verify
     let sG = Point::new_gx(&s);
     let right = R.add(&Q.mul_x(&m));

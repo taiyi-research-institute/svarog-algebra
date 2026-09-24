@@ -21,7 +21,7 @@ impl Scalar {
 impl abs::TrScalar<Secp256k1> for Scalar {
     #[inline]
     fn new(x: i64) -> Scalar {
-        let res = if x == 0 {
+        if x == 0 {
             Secp256k1::zero().clone()
         } else if x == 1 {
             Secp256k1::one().clone()
@@ -33,8 +33,7 @@ impl abs::TrScalar<Secp256k1> for Scalar {
             let mut num = [0u8; 32];
             num[24..].copy_from_slice(&(-x).to_be_bytes());
             Self(num).neg()
-        };
-        res
+        }
     }
 
     /// Draw from the OS RNG directly rather than from `rand::rng()`.
@@ -57,7 +56,7 @@ impl abs::TrScalar<Secp256k1> for Scalar {
         } else {
             (32 - buf.len(), 0)
         };
-        if buf.len() > 0 {
+        if !buf.is_empty() {
             num[dst..].copy_from_slice(&buf[src..]);
         }
         if num.as_ref() > Secp256k1::curve_order_bytes() {
@@ -92,14 +91,14 @@ impl abs::TrScalar<Secp256k1> for Scalar {
         let x: Integer = x.into();
         let x = x.modulo(Secp256k1::curve_order());
         let buf = x.to_digits::<u8>(rug::integer::Order::Msf);
-        return Self::new_from_bytes(&buf);
+        Self::new_from_bytes(&buf)
     }
 
     #[inline]
     fn to_int(&self) -> rug::Integer {
         let buf = self.to_bytes();
-        let x = rug::Integer::from_digits(&buf, rug::integer::Order::Msf);
-        return x;
+
+        rug::Integer::from_digits(&buf, rug::integer::Order::Msf)
     }
 
     #[inline]
@@ -172,9 +171,7 @@ impl abs::TrScalar<Secp256k1> for Scalar {
             return Secp256k1::zero().clone();
         }
         let mut x = self.clone();
-        let success = unsafe {
-            ffi::svarog_seckey_inverse(x.as_mut_c_ptr())
-        };
+        let success = unsafe { ffi::svarog_seckey_inverse(x.as_mut_c_ptr()) };
         assert_eq!(success, 1);
         x
     }
@@ -186,9 +183,7 @@ impl abs::TrScalar<Secp256k1> for Scalar {
             return Secp256k1::zero().clone();
         }
         let mut x = self.clone();
-        let success = unsafe {
-            ffi::svarog_seckey_inverse(x.as_mut_c_ptr())
-        };
+        let success = unsafe { ffi::svarog_seckey_inverse(x.as_mut_c_ptr()) };
         assert_eq!(success, 1);
         x
     }

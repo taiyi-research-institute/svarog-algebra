@@ -2,6 +2,10 @@
 name = "curve-abstract"
 version = "0.1.0"
 edition = "2024"
+description = "Common traits for elliptic curve points, scalars, and messaging."
+repository.workspace = true
+license.workspace = true
+readme = "README.md"
 
 [dependencies]
 serde = "1.0.219"

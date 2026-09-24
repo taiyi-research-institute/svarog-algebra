@@ -20,9 +20,7 @@ pub struct Keystore<C: TrCurve> {
 
 impl<C: TrCurve + 'static> Keystore<C> {
     pub fn public_key(&self) -> C::PointT {
-        let gui_list: Vec<&C::PointT> = self.vss_scheme.iter().map(|(_, FjX)| &FjX[0]).collect();
+        let gui_list: Vec<&C::PointT> = self.vss_scheme.values().map(|FjX| &FjX[0]).collect();
         C::PointT::sum(&gui_list)
     }
 }
-
-    

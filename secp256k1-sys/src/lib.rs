@@ -537,52 +537,52 @@ extern "C" {
     /// Default ECDH hash function
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdh_hash_function_default"
+        link_name = "svarog_secp256k1_v0_1_ecdh_hash_function_default"
     )]
     pub static secp256k1_ecdh_hash_function_default: EcdhHashFn;
 
     /// Default ECDH hash function for BIP324 key establishment
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ellswift_xdh_hash_function_bip324"
+        link_name = "svarog_secp256k1_v0_1_ellswift_xdh_hash_function_bip324"
     )]
     pub static secp256k1_ellswift_xdh_hash_function_bip324: EllswiftEcdhHashFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_nonce_function_rfc6979"
+        link_name = "svarog_secp256k1_v0_1_nonce_function_rfc6979"
     )]
     pub static secp256k1_nonce_function_rfc6979: NonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_nonce_function_default"
+        link_name = "svarog_secp256k1_v0_1_nonce_function_default"
     )]
     pub static secp256k1_nonce_function_default: NonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_nonce_function_bip340"
+        link_name = "svarog_secp256k1_v0_1_nonce_function_bip340"
     )]
     pub static secp256k1_nonce_function_bip340: SchnorrNonceFn;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_no_precomp"
+        link_name = "svarog_secp256k1_v0_1_context_no_precomp"
     )]
     pub static secp256k1_context_no_precomp: *const Context;
 
     // Contexts
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_preallocated_destroy"
+        link_name = "svarog_secp256k1_v0_1_context_preallocated_destroy"
     )]
     pub fn secp256k1_context_preallocated_destroy(cx: NonNull<Context>);
 
     // Signatures
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_der"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_parse_der"
     )]
     pub fn secp256k1_ecdsa_signature_parse_der(
         cx: *const Context,
@@ -593,7 +593,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_compact"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_parse_compact"
     )]
     pub fn secp256k1_ecdsa_signature_parse_compact(
         cx: *const Context,
@@ -603,7 +603,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_parse_der_lax"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_parse_der_lax"
     )]
     pub fn ecdsa_signature_parse_der_lax(
         cx: *const Context,
@@ -614,7 +614,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_serialize_der"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_serialize_der"
     )]
     pub fn secp256k1_ecdsa_signature_serialize_der(
         cx: *const Context,
@@ -625,7 +625,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_serialize_compact"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_serialize_compact"
     )]
     pub fn secp256k1_ecdsa_signature_serialize_compact(
         cx: *const Context,
@@ -635,7 +635,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ecdsa_signature_normalize"
+        link_name = "svarog_secp256k1_v0_1_ecdsa_signature_normalize"
     )]
     pub fn secp256k1_ecdsa_signature_normalize(
         cx: *const Context,
@@ -646,19 +646,19 @@ extern "C" {
     // Secret Keys
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_verify"
+        link_name = "svarog_secp256k1_v0_1_ec_seckey_verify"
     )]
     pub fn secp256k1_ec_seckey_verify(cx: *const Context, sk: *const c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_negate"
+        link_name = "svarog_secp256k1_v0_1_ec_seckey_negate"
     )]
     pub fn secp256k1_ec_seckey_negate(cx: *const Context, sk: *mut c_uchar) -> c_int;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_ec_seckey_tweak_add"
     )]
     pub fn secp256k1_ec_seckey_tweak_add(
         cx: *const Context,
@@ -667,7 +667,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_seckey_tweak_mul"
+        link_name = "svarog_secp256k1_v0_1_ec_seckey_tweak_mul"
     )]
     pub fn secp256k1_ec_seckey_tweak_mul(
         cx: *const Context,
@@ -675,14 +675,14 @@ extern "C" {
         tweak: *const c_uchar,
     ) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_sec")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_keypair_sec")]
     pub fn secp256k1_keypair_sec(
         cx: *const Context,
         output_seckey: *mut c_uchar,
         keypair: *const Keypair,
     ) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_pub")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_keypair_pub")]
     pub fn secp256k1_keypair_pub(
         cx: *const Context,
         output_pubkey: *mut PublicKey,
@@ -691,7 +691,7 @@ extern "C" {
     // Elligator Swift
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ellswift_encode"
+        link_name = "svarog_secp256k1_v0_1_ellswift_encode"
     )]
     pub fn secp256k1_ellswift_encode(
         ctx: *const Context,
@@ -701,7 +701,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ellswift_decode"
+        link_name = "svarog_secp256k1_v0_1_ellswift_decode"
     )]
     pub fn secp256k1_ellswift_decode(
         ctx: *const Context,
@@ -710,7 +710,7 @@ extern "C" {
     ) -> c_int;
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ellswift_create"
+        link_name = "svarog_secp256k1_v0_1_ellswift_create"
     )]
     pub fn secp256k1_ellswift_create(
         ctx: *const Context,
@@ -718,7 +718,7 @@ extern "C" {
         seckey32: *const c_uchar,
         aux_rand32: *const c_uchar,
     ) -> c_int;
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ellswift_xdh")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ellswift_xdh")]
     pub fn secp256k1_ellswift_xdh(
         ctx: *const Context,
         output: *mut c_uchar,
@@ -732,7 +732,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubnonce_parse"
+        link_name = "svarog_secp256k1_v0_1_musig_pubnonce_parse"
     )]
     pub fn secp256k1_musig_pubnonce_parse(
         cx: *const Context,
@@ -742,7 +742,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubnonce_serialize"
+        link_name = "svarog_secp256k1_v0_1_musig_pubnonce_serialize"
     )]
     pub fn secp256k1_musig_pubnonce_serialize(
         cx: *const Context,
@@ -752,7 +752,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_aggnonce_parse"
+        link_name = "svarog_secp256k1_v0_1_musig_aggnonce_parse"
     )]
     pub fn secp256k1_musig_aggnonce_parse(
         cx: *const Context,
@@ -762,7 +762,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_aggnonce_serialize"
+        link_name = "svarog_secp256k1_v0_1_musig_aggnonce_serialize"
     )]
     pub fn secp256k1_musig_aggnonce_serialize(
         cx: *const Context,
@@ -772,7 +772,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_partial_sig_parse"
+        link_name = "svarog_secp256k1_v0_1_musig_partial_sig_parse"
     )]
     pub fn secp256k1_musig_partial_sig_parse(
         cx: *const Context,
@@ -782,7 +782,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_partial_sig_serialize"
+        link_name = "svarog_secp256k1_v0_1_musig_partial_sig_serialize"
     )]
     pub fn secp256k1_musig_partial_sig_serialize(
         cx: *const Context,
@@ -792,7 +792,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubkey_agg"
+        link_name = "svarog_secp256k1_v0_1_musig_pubkey_agg"
     )]
     pub fn secp256k1_musig_pubkey_agg(
         cx: *const Context,
@@ -804,7 +804,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubkey_get"
+        link_name = "svarog_secp256k1_v0_1_musig_pubkey_get"
     )]
     pub fn secp256k1_musig_pubkey_get(
         cx: *const Context,
@@ -814,7 +814,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubkey_ec_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_musig_pubkey_ec_tweak_add"
     )]
     pub fn secp256k1_musig_pubkey_ec_tweak_add(
         cx: *const Context,
@@ -825,7 +825,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_pubkey_xonly_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_musig_pubkey_xonly_tweak_add"
     )]
     pub fn secp256k1_musig_pubkey_xonly_tweak_add(
         cx: *const Context,
@@ -836,7 +836,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_nonce_gen"
+        link_name = "svarog_secp256k1_v0_1_musig_nonce_gen"
     )]
     pub fn secp256k1_musig_nonce_gen(
         cx: *const Context,
@@ -852,7 +852,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_nonce_agg"
+        link_name = "svarog_secp256k1_v0_1_musig_nonce_agg"
     )]
     pub fn secp256k1_musig_nonce_agg(
         cx: *const Context,
@@ -863,7 +863,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_nonce_process"
+        link_name = "svarog_secp256k1_v0_1_musig_nonce_process"
     )]
     pub fn secp256k1_musig_nonce_process(
         cx: *const Context,
@@ -875,7 +875,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_partial_sign"
+        link_name = "svarog_secp256k1_v0_1_musig_partial_sign"
     )]
     pub fn secp256k1_musig_partial_sign(
         cx: *const Context,
@@ -888,7 +888,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_partial_sig_verify"
+        link_name = "svarog_secp256k1_v0_1_musig_partial_sig_verify"
     )]
     pub fn secp256k1_musig_partial_sig_verify(
         cx: *const Context,
@@ -901,7 +901,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_musig_partial_sig_agg"
+        link_name = "svarog_secp256k1_v0_1_musig_partial_sig_agg"
     )]
     pub fn secp256k1_musig_partial_sig_agg(
         cx: *const Context,
@@ -911,7 +911,7 @@ extern "C" {
         n_sigs: size_t,
     ) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ec_pubkey_sort")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ec_pubkey_sort")]
     pub fn secp256k1_ec_pubkey_sort(
         ctx: *const Context,
         pubkeys: *mut *const PublicKey,
@@ -924,13 +924,13 @@ extern "C" {
     // Contexts
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_preallocated_size"
+        link_name = "svarog_secp256k1_v0_1_context_preallocated_size"
     )]
     pub fn secp256k1_context_preallocated_size(flags: c_uint) -> size_t;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_preallocated_create"
+        link_name = "svarog_secp256k1_v0_1_context_preallocated_create"
     )]
     pub fn secp256k1_context_preallocated_create(
         prealloc: NonNull<c_void>,
@@ -939,13 +939,13 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_preallocated_clone_size"
+        link_name = "svarog_secp256k1_v0_1_context_preallocated_clone_size"
     )]
     pub fn secp256k1_context_preallocated_clone_size(cx: *const Context) -> size_t;
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_preallocated_clone"
+        link_name = "svarog_secp256k1_v0_1_context_preallocated_clone"
     )]
     pub fn secp256k1_context_preallocated_clone(
         cx: *const Context,
@@ -954,13 +954,13 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_context_randomize"
+        link_name = "svarog_secp256k1_v0_1_context_randomize"
     )]
     pub fn secp256k1_context_randomize(cx: NonNull<Context>, seed32: *const c_uchar) -> c_int;
     // Pubkeys
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_parse"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_parse"
     )]
     pub fn secp256k1_ec_pubkey_parse(
         cx: *const Context,
@@ -971,7 +971,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_serialize"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_serialize"
     )]
     pub fn secp256k1_ec_pubkey_serialize(
         cx: *const Context,
@@ -984,7 +984,7 @@ extern "C" {
     // EC
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_create"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_create"
     )]
     pub fn secp256k1_ec_pubkey_create(
         cx: *const Context,
@@ -994,11 +994,11 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_negate"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_negate"
     )]
     pub fn secp256k1_ec_pubkey_negate(cx: *const Context, pk: *mut PublicKey) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ec_pubkey_cmp")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ec_pubkey_cmp")]
     pub fn secp256k1_ec_pubkey_cmp(
         cx: *const Context,
         pubkey1: *const PublicKey,
@@ -1007,7 +1007,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_tweak_add"
     )]
     pub fn secp256k1_ec_pubkey_tweak_add(
         cx: *const Context,
@@ -1017,7 +1017,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_tweak_mul"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_tweak_mul"
     )]
     pub fn secp256k1_ec_pubkey_tweak_mul(
         cx: *const Context,
@@ -1027,7 +1027,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_ec_pubkey_combine"
+        link_name = "svarog_secp256k1_v0_1_ec_pubkey_combine"
     )]
     pub fn secp256k1_ec_pubkey_combine(
         cx: *const Context,
@@ -1036,7 +1036,7 @@ extern "C" {
         n: size_t,
     ) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdh")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ecdh")]
     pub fn secp256k1_ecdh(
         cx: *const Context,
         output: *mut c_uchar,
@@ -1047,7 +1047,7 @@ extern "C" {
     ) -> c_int;
 
     // ECDSA
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdsa_verify")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ecdsa_verify")]
     pub fn secp256k1_ecdsa_verify(
         cx: *const Context,
         sig: *const Signature,
@@ -1055,7 +1055,7 @@ extern "C" {
         pk: *const PublicKey,
     ) -> c_int;
 
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_ecdsa_sign")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_ecdsa_sign")]
     pub fn secp256k1_ecdsa_sign(
         cx: *const Context,
         sig: *mut Signature,
@@ -1068,7 +1068,7 @@ extern "C" {
     // Schnorr Signatures
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_schnorrsig_sign"
+        link_name = "svarog_secp256k1_v0_1_schnorrsig_sign"
     )]
     pub fn secp256k1_schnorrsig_sign(
         cx: *const Context,
@@ -1081,7 +1081,7 @@ extern "C" {
     // Schnorr Signatures with extra parameters (see [`SchnorrSigExtraParams`])
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_schnorrsig_sign_custom"
+        link_name = "svarog_secp256k1_v0_1_schnorrsig_sign_custom"
     )]
     pub fn secp256k1_schnorrsig_sign_custom(
         cx: *const Context,
@@ -1094,7 +1094,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_schnorrsig_verify"
+        link_name = "svarog_secp256k1_v0_1_schnorrsig_verify"
     )]
     pub fn secp256k1_schnorrsig_verify(
         cx: *const Context,
@@ -1105,7 +1105,7 @@ extern "C" {
     ) -> c_int;
 
     // Extra keys
-    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "rustsecp256k1_v0_13_keypair_create")]
+    #[cfg_attr(not(rust_secp_no_symbol_renaming), link_name = "svarog_secp256k1_v0_1_keypair_create")]
     pub fn secp256k1_keypair_create(
         cx: *const Context,
         keypair: *mut Keypair,
@@ -1114,7 +1114,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_parse"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_parse"
     )]
     pub fn secp256k1_xonly_pubkey_parse(
         cx: *const Context,
@@ -1124,7 +1124,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_serialize"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_serialize"
     )]
     pub fn secp256k1_xonly_pubkey_serialize(
         cx: *const Context,
@@ -1134,7 +1134,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_from_pubkey"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_from_pubkey"
     )]
     pub fn secp256k1_xonly_pubkey_from_pubkey(
         cx: *const Context,
@@ -1145,7 +1145,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_cmp"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_cmp"
     )]
     pub fn secp256k1_xonly_pubkey_cmp(
         cx: *const Context,
@@ -1155,7 +1155,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_tweak_add"
     )]
     pub fn secp256k1_xonly_pubkey_tweak_add(
         cx: *const Context,
@@ -1166,7 +1166,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_keypair_xonly_pub"
+        link_name = "svarog_secp256k1_v0_1_keypair_xonly_pub"
     )]
     pub fn secp256k1_keypair_xonly_pub(
         cx: *const Context,
@@ -1177,7 +1177,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_keypair_xonly_tweak_add"
+        link_name = "svarog_secp256k1_v0_1_keypair_xonly_tweak_add"
     )]
     pub fn secp256k1_keypair_xonly_tweak_add(
         cx: *const Context,
@@ -1187,7 +1187,7 @@ extern "C" {
 
     #[cfg_attr(
         not(rust_secp_no_symbol_renaming),
-        link_name = "rustsecp256k1_v0_13_xonly_pubkey_tweak_add_check"
+        link_name = "svarog_secp256k1_v0_1_xonly_pubkey_tweak_add_check"
     )]
     pub fn secp256k1_xonly_pubkey_tweak_add_check(
         cx: *const Context,
@@ -1215,7 +1215,7 @@ extern "C" {
 /// The newly created secp256k1 raw context.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
 pub unsafe fn secp256k1_context_create(flags: c_uint) -> NonNull<Context> {
-    rustsecp256k1_v0_13_context_create(flags)
+    svarog_secp256k1_v0_1_context_create(flags)
 }
 
 /// A reimplementation of the C function `secp256k1_context_create` in rust.
@@ -1224,7 +1224,7 @@ pub unsafe fn secp256k1_context_create(flags: c_uint) -> NonNull<Context> {
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)] // Documented above.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
-pub unsafe extern "C" fn rustsecp256k1_v0_13_context_create(flags: c_uint) -> NonNull<Context> {
+pub unsafe extern "C" fn svarog_secp256k1_v0_1_context_create(flags: c_uint) -> NonNull<Context> {
     use core::mem;
 
     use crate::alloc::alloc;
@@ -1258,13 +1258,13 @@ pub unsafe extern "C" fn rustsecp256k1_v0_13_context_create(flags: c_uint) -> No
 ///  `ctx` must be a valid pointer to a block of memory created using [`secp256k1_context_create`].
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
 pub unsafe fn secp256k1_context_destroy(ctx: NonNull<Context>) {
-    rustsecp256k1_v0_13_context_destroy(ctx)
+    svarog_secp256k1_v0_1_context_destroy(ctx)
 }
 
 #[no_mangle]
 #[allow(clippy::missing_safety_doc)] // Documented above.
 #[cfg(all(feature = "alloc", not(rust_secp_no_symbol_renaming)))]
-pub unsafe extern "C" fn rustsecp256k1_v0_13_context_destroy(mut ctx: NonNull<Context>) {
+pub unsafe extern "C" fn svarog_secp256k1_v0_1_context_destroy(mut ctx: NonNull<Context>) {
     use crate::alloc::alloc;
     secp256k1_context_preallocated_destroy(ctx);
     let ctx: *mut Context = ctx.as_mut();
@@ -1300,7 +1300,7 @@ pub unsafe extern "C" fn rustsecp256k1_v0_13_context_destroy(mut ctx: NonNull<Co
 /// For exact safety constraints see [`std::slice::from_raw_parts`] and [`std::str::from_utf8_unchecked`].
 #[no_mangle]
 #[cfg(not(rust_secp_no_symbol_renaming))]
-pub unsafe extern "C" fn rustsecp256k1_v0_13_default_illegal_callback_fn(
+pub unsafe extern "C" fn svarog_secp256k1_v0_1_default_illegal_callback_fn(
     message: *const c_char,
     _data: *mut c_void,
 ) {
@@ -1331,7 +1331,7 @@ pub unsafe extern "C" fn rustsecp256k1_v0_13_default_illegal_callback_fn(
 /// For exact safety constraints see [`std::slice::from_raw_parts`] and [`std::str::from_utf8_unchecked`].
 #[no_mangle]
 #[cfg(not(rust_secp_no_symbol_renaming))]
-pub unsafe extern "C" fn rustsecp256k1_v0_13_default_error_callback_fn(
+pub unsafe extern "C" fn svarog_secp256k1_v0_1_default_error_callback_fn(
     message: *const c_char,
     _data: *mut c_void,
 ) {
@@ -1492,12 +1492,12 @@ mod fuzz_dummy {
     compile_error!("We do not support fuzzing with rust_secp_no_symbol_renaming");
 
     extern "C" {
-        fn rustsecp256k1_v0_13_context_preallocated_size(flags: c_uint) -> size_t;
-        fn rustsecp256k1_v0_13_context_preallocated_create(
+        fn svarog_secp256k1_v0_1_context_preallocated_size(flags: c_uint) -> size_t;
+        fn svarog_secp256k1_v0_1_context_preallocated_create(
             prealloc: NonNull<c_void>,
             flags: c_uint,
         ) -> NonNull<Context>;
-        fn rustsecp256k1_v0_13_context_preallocated_clone(
+        fn svarog_secp256k1_v0_1_context_preallocated_clone(
             cx: *const Context,
             prealloc: NonNull<c_void>,
         ) -> NonNull<Context>;
@@ -1510,7 +1510,7 @@ mod fuzz_dummy {
     // Contexts
     pub unsafe fn secp256k1_context_preallocated_size(flags: c_uint) -> size_t {
         assert!(
-            rustsecp256k1_v0_13_context_preallocated_size(flags) + std::mem::size_of::<c_uint>()
+            svarog_secp256k1_v0_1_context_preallocated_size(flags) + std::mem::size_of::<c_uint>()
                 <= CTX_SIZE
         );
         CTX_SIZE
@@ -1536,13 +1536,13 @@ mod fuzz_dummy {
                 have_ctx = HAVE_PREALLOCATED_CONTEXT.swap(HAVE_CONTEXT_WORKING, Ordering::AcqRel);
                 if have_ctx == HAVE_CONTEXT_NONE {
                     assert!(
-                        rustsecp256k1_v0_13_context_preallocated_size(
+                        svarog_secp256k1_v0_1_context_preallocated_size(
                             SECP256K1_START_SIGN | SECP256K1_START_VERIFY
                         ) + std::mem::size_of::<c_uint>()
                             <= CTX_SIZE
                     );
                     assert_eq!(
-                        rustsecp256k1_v0_13_context_preallocated_create(
+                        svarog_secp256k1_v0_1_context_preallocated_create(
                             NonNull::new_unchecked(
                                 PREALLOCATED_CONTEXT[..].as_mut_ptr() as *mut c_void
                             ),
@@ -1589,7 +1589,7 @@ mod fuzz_dummy {
             (prealloc.as_ptr() as *mut u8).add(CTX_SIZE).sub(std::mem::size_of::<c_uint>());
         let flags = (orig_ptr as *mut c_uint).read();
         (new_ptr as *mut c_uint).write(flags);
-        rustsecp256k1_v0_13_context_preallocated_clone(cx, prealloc)
+        svarog_secp256k1_v0_1_context_preallocated_clone(cx, prealloc)
     }
 
     pub unsafe fn secp256k1_context_randomize(
@@ -2091,7 +2091,7 @@ pub struct GeStorage {
 }
 
 /// Internal scalar (4×u64, native endian). 32 bytes.
-/// Different layout from the 32-byte big-endian representation used by Scalar([u8;32]).
+/// Different layout from the 32-byte big-endian representation used by `Scalar([u8; 32])`.
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct CScalar {
@@ -2110,52 +2110,84 @@ impl Gej {
 
 extern "C" {
     // --- Group element operations ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_set_infinity"]
     pub fn svarog_gej_set_infinity(r: *mut Gej);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_is_infinity"]
     pub fn svarog_gej_is_infinity(a: *const Gej) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ge_is_infinity"]
     pub fn svarog_ge_is_infinity(a: *const Ge) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ge_set_gej_var"]
     pub fn svarog_ge_set_gej_var(r: *mut Ge, a: *mut Gej);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_set_ge"]
     pub fn svarog_gej_set_ge(r: *mut Gej, a: *const Ge);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ge_set_xy"]
     pub fn svarog_ge_set_xy(r: *mut Ge, x: *const Fe, y: *const Fe);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_neg"]
     pub fn svarog_gej_neg(r: *mut Gej, a: *const Gej);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_add_var"]
     pub fn svarog_gej_add_var(r: *mut Gej, a: *const Gej, b: *const Gej, rzr: *mut Fe);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_add_ge_var"]
     pub fn svarog_gej_add_ge_var(r: *mut Gej, a: *const Gej, b: *const Ge, rzr: *mut Fe);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_double_var"]
     pub fn svarog_gej_double_var(r: *mut Gej, a: *const Gej, rzr: *mut Fe);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ge_to_storage"]
     pub fn svarog_ge_to_storage(r: *mut GeStorage, a: *const Ge);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ge_from_storage"]
     pub fn svarog_ge_from_storage(r: *mut Ge, a: *const GeStorage);
 
     // --- High-level gej convenience ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_eq_var"]
     pub fn svarog_gej_eq_var(a: *const Gej, b: *const Gej) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ecmult_const_gej"]
     pub fn svarog_ecmult_const_gej(r: *mut Gej, a: *const Gej, q: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_to_storage"]
     pub fn svarog_gej_to_storage(r: *mut GeStorage, a: *const Gej) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_from_storage"]
     pub fn svarog_gej_from_storage(r: *mut Gej, a: *const GeStorage);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_serialize"]
     pub fn svarog_gej_serialize(
         out: *mut c_uchar, outlen: *mut c_int,
         a: *const Gej, compressed: c_int,
     ) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_gej_parse"]
     pub fn svarog_gej_parse(
         r: *mut Gej, input: *const c_uchar, inputlen: c_int,
     ) -> c_int;
 
     // --- Scalar multiplication (low-level) ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ecmult_const"]
     pub fn svarog_ecmult_const(r: *mut Gej, a: *const Ge, q: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_ecmult_gen"]
     pub fn svarog_ecmult_gen(ctx: *const Context, r: *mut Gej, a: *const CScalar);
 
     // --- Field element operations ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_fe_set_b32_limit"]
     pub fn svarog_fe_set_b32_limit(r: *mut Fe, a: *const c_uchar) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_fe_get_b32"]
     pub fn svarog_fe_get_b32(r: *mut c_uchar, a: *const Fe);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_fe_normalize_var"]
     pub fn svarog_fe_normalize_var(r: *mut Fe);
 
     // --- Scalar operations ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_set_b32"]
     pub fn svarog_scalar_set_b32(r: *mut CScalar, bin: *const c_uchar, overflow: *mut c_int);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_get_b32"]
     pub fn svarog_scalar_get_b32(bin: *mut c_uchar, a: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_negate"]
     pub fn svarog_scalar_negate(r: *mut CScalar, a: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_add"]
     pub fn svarog_scalar_add(r: *mut CScalar, a: *const CScalar, b: *const CScalar) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_mul"]
     pub fn svarog_scalar_mul(r: *mut CScalar, a: *const CScalar, b: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_inverse_var"]
     pub fn svarog_scalar_inverse_var(r: *mut CScalar, a: *const CScalar);
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_is_zero"]
     pub fn svarog_scalar_is_zero(a: *const CScalar) -> c_int;
+    #[link_name = "svarog_secp256k1_v0_1_svarog_scalar_eq"]
     pub fn svarog_scalar_eq(a: *const CScalar, b: *const CScalar) -> c_int;
 
     // --- High-level seckey inverse (operates on [u8;32] like other ec_seckey_* fns) ---
+    #[link_name = "svarog_secp256k1_v0_1_svarog_seckey_inverse"]
     pub fn svarog_seckey_inverse(seckey: *mut c_uchar) -> c_int;
 }
 

@@ -39,13 +39,13 @@ impl abs::TrCurve for Secp256k1 {
     fn curve_order() -> &'static Integer {
         static N: LazyLock<Integer> =
             LazyLock::new(|| Integer::from_digits(Secp256k1::curve_order_bytes(), Order::Msf));
-        return &N;
+        &N
     }
 
     fn field_order() -> &'static Integer {
         static P: LazyLock<Integer> =
             LazyLock::new(|| Integer::from_digits(Secp256k1::field_order_bytes(), Order::Msf));
-        return &P;
+        &P
     }
 
     fn generator() -> &'static Point {

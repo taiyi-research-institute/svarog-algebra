@@ -6,19 +6,22 @@ use erreur::*;
 
 use super::ShamirScheme;
 
+/// Polynomial coefficients, public commitments, and shares indexed by participant.
+pub type GeneratedShares<C> = (
+    Vec<<C as TrCurve>::ScalarT>,
+    Vec<<C as TrCurve>::PointT>,
+    HashMap<usize, <C as TrCurve>::ScalarT>,
+);
+
 impl<C: TrCurve + 'static> VerifiableSecretSharing<C> for C {
-    fn generate_shares(
-        ui: &C::ScalarT,
-        omega_k: &HashSet<usize>,
-        th: usize,
-    ) -> (Vec<C::ScalarT>, Vec<C::PointT>, HashMap<usize, C::ScalarT>) {
+    fn generate_shares(ui: &C::ScalarT, omega_k: &HashSet<usize>, th: usize) -> GeneratedShares<C> {
         assert!(th >= 1 && th <= omega_k.len());
 
         // generate $$f_i(X)$$, a secret, ephemeral polynomial.
         let mut fiX: Vec<C::ScalarT> = vec![C::zero().clone(); th];
         fiX[0] = ui.clone();
-        for k in 1..th {
-            fiX[k] = C::ScalarT::new_rand();
+        for coefficient in fiX.iter_mut().skip(1) {
+            *coefficient = C::ScalarT::new_rand();
         }
 
         // commit $$f_i(X)$$ as $$F_i(X)$$.
@@ -76,7 +79,7 @@ impl<C: TrCurve + 'static> VerifiableSecretSharing<C> for C {
     fn eval_xi_com(i: usize, vss_scheme: &ShamirScheme<C>) -> C::PointT {
         let mut xig = C::identity().clone();
         let i_scalar = C::ScalarT::new(i as i64);
-        for (_, polycom) in vss_scheme {
+        for polycom in vss_scheme.values() {
             let Fji = Self::eval_polycom(&i_scalar, polycom);
             xig = xig.add(&Fji);
         }
@@ -108,9 +111,9 @@ pub trait VerifiableSecretSharing<C: TrCurve> {
     /// Math.
     ///
     /// * Generate $$f_i(X) = a_0X^0 + a_1X^1 + \dots + a_{t-1}X^{t-1}$$,
-    /// Here, $$a_0 := u_i$$, and other coefficients are randomly generated.
+    ///   Here, $$a_0 := u_i$$, and other coefficients are randomly generated.
     /// * Evalute $$f_i(j)$$ for any $$j\in \Omega_k$$.
-    /// Here, $$\Omega_k$$ is the set of keygen player ids.
+    ///   Here, $$\Omega_k$$ is the set of keygen player ids.
     ///
     /// Parameters.
     ///
@@ -134,11 +137,7 @@ pub trait VerifiableSecretSharing<C: TrCurve> {
     /// whose "power by integer >= 0" and "multiplication by coefficient" is properly defined.
     ///
     /// Such replacement is called "evaluation".
-    fn generate_shares(
-        ui: &C::ScalarT,
-        omega_k: &HashSet<usize>,
-        th: usize,
-    ) -> (Vec<C::ScalarT>, Vec<C::PointT>, HashMap<usize, C::ScalarT>);
+    fn generate_shares(ui: &C::ScalarT, omega_k: &HashSet<usize>, th: usize) -> GeneratedShares<C>;
 
     /// Evaluate a polynomial at x, modulo curve order.
     ///

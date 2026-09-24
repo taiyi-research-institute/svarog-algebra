@@ -49,8 +49,8 @@ pub fn test_vss_impl<C: TrCurve + 'static>() {
         everyi_received_xji_map.insert(*i, xji_map);
     }
     for i in &omega_k {
-        let ui = &ui_map[&i];
-        let (FiX, fij_map) = C::generate_shares(ui, &omega_k, th);
+        let ui = &ui_map[i];
+        let (_, FiX, fij_map) = C::generate_shares(ui, &omega_k, th);
         vss_scheme.insert(*i, FiX);
         for (j, fij) in &fij_map {
             let xj = xi_map.get_mut(j).unwrap();
@@ -58,7 +58,7 @@ pub fn test_vss_impl<C: TrCurve + 'static>() {
             let xij = everyi_received_xji_map
                 .get_mut(j)
                 .unwrap()
-                .get_mut(&i)
+                .get_mut(i)
                 .unwrap();
             *xij = fij.clone();
         }
@@ -88,7 +88,7 @@ pub fn test_vss_impl<C: TrCurve + 'static>() {
 
     // 2.2. Verify xji
     for i in &omega_k {
-        let xji_map = &everyi_received_xji_map[&i];
+        let xji_map = &everyi_received_xji_map[i];
         C::verify_fj_at_i(*i, xji_map, &vss_scheme).unwrap();
     }
     let dur = start.elapsed().as_micros() - dur;
@@ -103,12 +103,12 @@ pub fn test_vss_impl<C: TrCurve + 'static>() {
         .cloned()
         .collect();
     omega_s.sort();
-    println!("signers = {:?}", &omega_s);
+    println!("signers = {:?}", omega_s);
     let omega_s: HashSet<usize> = omega_s.into_iter().collect();
     let mut wi_map: HashMap<usize, C::ScalarT> =
         omega_s.iter().map(|i| (*i, C::zero().clone())).collect();
     for i in &omega_s {
-        let wi = wi_map.get_mut(&i).unwrap();
+        let wi = wi_map.get_mut(i).unwrap();
         let lambda_i = C::lagrange_lambda(*i, &omega_s);
         assert_ne!(&lambda_i, C::zero());
         *wi = xi_map[i].mul(&lambda_i);
@@ -152,7 +152,7 @@ fn test0() {
         (1..=nk).map(|k| (k, Secp256k1::zero().clone())).collect();
     for i in &omega_k {
         let ui = &ui_map[i];
-        let (_fi_x, fij_map) = Secp256k1::generate_shares(ui, &omega_k, th);
+        let (_, _, fij_map) = Secp256k1::generate_shares(ui, &omega_k, th);
         for (j, fij) in fij_map {
             let xj = xi_map.get_mut(&j).unwrap();
             *xj = xj.add(&fij);
@@ -192,14 +192,14 @@ fn test0() {
         }
         assert!(scalar_sum == Scalar::new_from_int(plan1.clone()));
 
-        println!("真私钥: \n{}", scalar_sum.to_int());
+        println!("真私钥：\n{}", scalar_sum.to_int());
         println!(
-            "\x1b[31m方案1, 绕N {} 圈: \n{}\x1b[0m",
+            "\x1b[31m方案 1，绕 N {} 圈：\n{}\x1b[0m",
             plan1.clone().div_euc(Secp256k1::curve_order()),
             plan1
         );
         println!(
-            "\x1b[32m方案2, 绕N {} 圈: \n{}\x1b[0m",
+            "\x1b[32m方案 2，绕 N {} 圈：\n{}\x1b[0m",
             plan2.clone().div_euc(Secp256k1::curve_order()),
             plan2
         );

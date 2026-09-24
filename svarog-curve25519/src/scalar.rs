@@ -53,14 +53,14 @@ impl TrScalar<Curve25519> for Scalar {
         let x: Integer = x.into();
         let x = x.modulo(Curve25519::curve_order());
         let buf = x.to_digits::<u8>(rug::integer::Order::Lsf);
-        return Self::new_from_bytes(&buf);
+        Self::new_from_bytes(&buf)
     }
 
     #[inline]
     fn to_int(&self) -> rug::Integer {
         let buf = self.to_bytes();
-        let x = rug::Integer::from_digits(&buf, rug::integer::Order::Lsf);
-        return x;
+
+        rug::Integer::from_digits(&buf, rug::integer::Order::Lsf)
     }
 
     #[inline]

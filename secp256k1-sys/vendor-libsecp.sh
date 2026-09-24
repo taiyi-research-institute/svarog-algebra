@@ -8,7 +8,7 @@ else
     SECP_VENDOR_GIT_ROOT="$(realpath "$SECP_VENDOR_GIT_ROOT")"
 fi
 SECP_SYS="$SECP_VENDOR_GIT_ROOT"/secp256k1-sys
-DEFAULT_VERSION_CODE=$(grep "^version" "$SECP_SYS/Cargo.toml" | sed 's/\./_/g' | sed 's/.*"\(.*\)".*/\1/' | cut -d_ -f1-2)
+DEFAULT_VERSION_CODE=0_13
 DEFAULT_DEPEND_DIR="$SECP_SYS/depend"
 DEFAULT_SECP_REPO=https://github.com/bitcoin-core/secp256k1.git
 
@@ -61,6 +61,15 @@ if [ "$FORCE" == "no" ]; then
         exit 2
     fi
 fi
+
+# The Rust ABI and build-time namespace mapping target this upstream release.
+if [ "$SECP_VENDOR_VERSION_CODE" != "0_13" ]; then
+    echo "Update build.rs and the Rust FFI ABI before changing the upstream version." >&2
+    exit 2
+fi
+SVAROG_PATCH_COPY=$(mktemp)
+trap 'rm -f "$SVAROG_PATCH_COPY"' EXIT
+cp "$SECP_SYS/depend/secp256k1/src/svarog_algebra_impl.h" "$SVAROG_PATCH_COPY"
 
 DIR=./secp256k1
 
@@ -115,14 +124,9 @@ find "$DIR" \
     -type f \
     -print0 | xargs -0 sed -i "/^#include/! s/ecdsa_signature_parse_der_lax/rustsecp256k1_v${SECP_VENDOR_VERSION_CODE}_ecdsa_signature_parse_der_lax/g"
 
-cd "$SECP_SYS"
-# Update the `links = ` in the manifest file.
-sed -i -r "s/^links = \".*\"$/links = \"rustsecp256k1_v${SECP_VENDOR_VERSION_CODE}\"/" Cargo.toml
-# Update the extern references in the Rust FFI source files.
-find "./src/" \
-    -name "*.rs" \
-    -type f \
-    -print0 | xargs -0 sed -i -r "s/rustsecp256k1_v[0-9]+_[0-9]+_[0-9]+_(.*)([\"\(])/rustsecp256k1_v${SECP_VENDOR_VERSION_CODE}_\1\2/g"
+# Preserve the Svarog extension. build.rs applies the fork namespace at compile time.
+cp "$SVAROG_PATCH_COPY" "$DIR/src/svarog_algebra_impl.h"
+printf '\n#include "svarog_algebra_impl.h"\n' >> "$DIR/src/secp256k1.c"
 
 popd > /dev/null
 

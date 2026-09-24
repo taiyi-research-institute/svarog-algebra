@@ -52,7 +52,7 @@ impl Drop for Context {
 }
 
 thread_local! {
-    static CTX: RefCell<Option<Context>> = RefCell::new(None);
+    static CTX: RefCell<Option<Context>> = const { RefCell::new(None) };
 }
 
 pub(crate) fn thlocal_ctx() -> *const ffi::Context {

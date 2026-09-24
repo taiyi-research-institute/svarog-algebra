@@ -1,0 +1,14 @@
+[workspace]
+resolver = "3"
+members = [
+    "curve-abstract",
+    "secp256k1-sys",
+    "svarog-curve25519",
+    "svarog-secp256k1",
+    "svarog-lagrange",
+]
+exclude = ["classgroup", "cl-playground"]
+
+[workspace.package]
+repository = "https://github.com/taiyi-research-institute/svarog-algebra"
+license = "MIT OR Apache-2.0"

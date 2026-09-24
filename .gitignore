@@ -1,1 +1,8 @@
 **/target
+
+# Workspace members share the root lockfile.
+/curve-abstract/Cargo.lock
+/svarog-curve25519/Cargo.lock
+/svarog-secp256k1/Cargo.lock
+/svarog-lagrange/Cargo.lock
+/secp256k1-sys/Cargo.lock

@@ -75,17 +75,17 @@ impl TrPoint<Curve25519> for Point {
 
     #[inline]
     fn add(&self, other: &Self) -> Self {
-        Self(&self.0 + &other.0)
+        Self(self.0 + other.0)
     }
 
     #[inline]
     fn sub(&self, other: &Self) -> Self {
-        Self(&self.0 - &other.0)
+        Self(self.0 - other.0)
     }
 
     #[inline]
     fn sum(points: &[&Self]) -> Self {
-        let it: _ = points.iter().map(|x| x.0);
+        let it = points.iter().map(|x| x.0);
         Self(SubgroupPoint::sum(it))
     }
 
@@ -116,6 +116,6 @@ impl TrPoint<Curve25519> for Point {
 
     #[inline]
     fn mul_x(&self, x: &Scalar) -> Self {
-        Self(&self.0 * &x.0)
+        Self(self.0 * x.0)
     }
 }

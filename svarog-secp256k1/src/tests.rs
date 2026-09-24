@@ -85,7 +85,7 @@ fn test_point() {
 
     // new random points sum to 0
     let x = Scalar::new_rand();
-    let p0 = Secp256k1::identity().clone();
+    let p0 = *Secp256k1::identity();
     let p1 = Point::new_gx(&x);
     let p2 = Point::new_gx(&x.neg());
     assert_ne!(p1, p0);
