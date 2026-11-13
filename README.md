@@ -7,7 +7,7 @@
 
 ## 发布检查
 
-运行检查和 workspace 发布预演需要 Cargo 1.90 或更新版本，并安装 Clippy。
+本 workspace 使用 Rust 1.100.0，并在发布检查中使用 Clippy。
 首次构建需要 C 编译器、`make` 和 `m4`；Cargo 会构建 vendored 原生依赖。
 发布检查需要访问 crates.io，并要求待打包文件的修改已经提交。
 
